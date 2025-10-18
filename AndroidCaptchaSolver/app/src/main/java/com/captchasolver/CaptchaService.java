@@ -28,6 +28,11 @@ public class CaptchaService extends AccessibilityService {
     private static final String VERIFY_BUTTON_TEXT = "验证";
     private static final int GRID_SIZE = 3; // 3x3网格
     
+    // 防止重复触发
+    private boolean isProcessing = false;
+    private long lastProcessTime = 0;
+    private static final long MIN_PROCESS_INTERVAL = 5000; // 最小处理间隔5秒
+    
     @Override
     public void onCreate() {
         super.onCreate();
@@ -69,24 +74,49 @@ public class CaptchaService extends AccessibilityService {
         String packageName = event.getPackageName().toString();
         int eventType = event.getEventType();
         
-        // 记录所有事件（便于调试）
+        // 只处理窗口状态改变事件（避免内容变化事件太频繁）
+        if (eventType != AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED) {
+            return;
+        }
+        
+        // 检查是否正在处理或距离上次处理时间过短
+        long currentTime = System.currentTimeMillis();
+        if (isProcessing) {
+            Log.d(TAG, "正在处理中，跳过此次事件");
+            return;
+        }
+        
+        if (currentTime - lastProcessTime < MIN_PROCESS_INTERVAL) {
+            Log.d(TAG, "距离上次处理时间过短，跳过此次事件");
+            return;
+        }
+        
+        // 记录事件
         Log.d(TAG, "事件: " + eventTypeToString(eventType) + " 包名: " + packageName);
         logToActivity("事件: " + eventTypeToString(eventType) + " 包名: " + packageName);
         
-        // 监听所有应用，包括币安APP
+        // 监听所有应用，包括币安APP和Chrome
         Log.d(TAG, "检测到应用: " + packageName + "，准备处理验证码");
         logToActivity("检测到应用: " + packageName);
         
+        // 标记为正在处理
+        isProcessing = true;
+        lastProcessTime = currentTime;
+        
         // 延迟执行，确保界面完全加载
-        mainHandler.removeCallbacksAndMessages(null); // 移除之前的任务
         mainHandler.postDelayed(new Runnable() {
             @Override
             public void run() {
-                Log.d(TAG, "触发验证码识别...");
-                logToActivity("触发验证码识别...");
-                captchaSolver.processCaptcha();
+                try {
+                    Log.d(TAG, "触发验证码识别...");
+                    logToActivity("触发验证码识别...");
+                    captchaSolver.processCaptcha();
+                } finally {
+                    // 处理完成后重置标志
+                    isProcessing = false;
+                }
             }
-        }, 2000); // 2秒延迟，给币安APP足够时间加载
+        }, 2000); // 2秒延迟，给应用足够时间加载
     }
     
     /**

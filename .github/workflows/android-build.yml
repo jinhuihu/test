@@ -1,11 +1,10 @@
-name: Android CI - 编译 APK
+name: Android CI Build
 
 on:
-  # 当推送到 main 或 master 分支时自动编译
   push:
-    branches: [ main, master ]
-  
-  # 允许手动触发工作流
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
   workflow_dispatch:
 
 jobs:
@@ -13,41 +12,67 @@ jobs:
     runs-on: ubuntu-latest
     
     steps:
-    # 1. 检出代码
     - name: 检出代码
-      uses: actions/checkout@v4
-    
-    # 2. 设置 JDK 17
-    - name: 设置 JDK 17
-      uses: actions/setup-java@v4
+      uses: actions/checkout@v3
+      
+    - name: 设置JDK 17
+      uses: actions/setup-java@v3
       with:
         java-version: '17'
         distribution: 'temurin'
-    
-    # 3. 授予 gradlew 执行权限
-    - name: 授予 Gradle 执行权限
-      run: |
-        cd AndroidCaptchaSolver
-        chmod +x gradlew
-    
-    # 4. 编译 Debug APK
-    - name: 编译 Debug APK
+        
+    - name: 授予Gradlew执行权限
+      run: chmod +x AndroidCaptchaSolver/gradlew
+      
+    - name: 使用Gradle编译Debug APK
       run: |
         cd AndroidCaptchaSolver
         ./gradlew assembleDebug --stacktrace
-    
-    # 5. 上传编译好的 APK
-    - name: 上传 APK
-      uses: actions/upload-artifact@v4
+        
+    - name: 查找APK文件
+      run: |
+        echo "寻找编译好的APK文件..."
+        find AndroidCaptchaSolver/app/build/outputs -name "*.apk" -type f
+        
+    - name: 上传APK文件
+      uses: actions/upload-artifact@v3
       with:
         name: app-debug
-        path: AndroidCaptchaSolver/app/build/outputs/apk/debug/app-debug.apk
+        path: AndroidCaptchaSolver/app/build/outputs/apk/debug/*.apk
         retention-days: 30
-    
-    # 6. 显示编译成功信息
-    - name: 编译成功
+        
+    - name: 获取短提交SHA
+      id: slug
+      run: echo "sha8=$(echo ${{github.sha}} | cut -c1-8)" >> $GITHUB_OUTPUT
+      
+    - name: 重命名APK（可选）
       run: |
-        echo "✅ APK 编译成功！"
-        echo "📦 在 Actions 页面底部的 Artifacts 部分下载 APK"
-        echo "🔗 访问: https://github.com/${{ github.repository }}/actions"
-
+        cd AndroidCaptchaSolver/app/build/outputs/apk/debug
+        for file in *.apk; do
+          mv "$file" "captcha-solver-${{ steps.slug.outputs.sha8 }}.apk"
+        done
+        
+    - name: 创建Release（推送到main时）
+      if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+      uses: softprops/action-gh-release@v1
+      with:
+        tag_name: v1.0.${{ github.run_number }}
+        name: Release v1.0.${{ github.run_number }}
+        body: |
+          🎉 自动编译版本
+          
+          **修改内容：**
+          - 修复Chrome浏览器事件频繁触发导致无法识别的问题
+          - 添加处理间隔控制，防止重复触发
+          - 只监听窗口状态改变事件
+          
+          **提交信息：**
+          - Commit: ${{ github.sha }}
+          - 作者: ${{ github.actor }}
+          
+          请下载下方的APK文件安装到手机
+        files: AndroidCaptchaSolver/app/build/outputs/apk/debug/*.apk
+        draft: false
+        prerelease: false
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
