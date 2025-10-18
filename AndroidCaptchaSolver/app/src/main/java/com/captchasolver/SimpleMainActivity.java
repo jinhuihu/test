@@ -30,6 +30,7 @@ public class SimpleMainActivity extends Activity {
     
     private static SimpleMainActivity instance;
     private ServiceHealthChecker healthChecker;
+    private ServiceRepairHelper repairHelper;
     
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -37,8 +38,9 @@ public class SimpleMainActivity extends Activity {
         
         instance = this;
         
-        // 初始化健康检查器
+        // 初始化健康检查器和修复助手
         healthChecker = new ServiceHealthChecker(this);
+        repairHelper = new ServiceRepairHelper(this);
         
         // 创建简单的界面
         createSimpleUI();
@@ -155,6 +157,15 @@ public class SimpleMainActivity extends Activity {
         btnCheckStatus.setBackgroundColor(0xFF607D8B);
         btnCheckStatus.setPadding(20, 20, 20, 20);
         mainLayout.addView(btnCheckStatus);
+        
+        // 故障修复按钮
+        Button btnRepair = new Button(this);
+        btnRepair.setText("修复服务故障");
+        btnRepair.setTextColor(0xFFFFFFFF);
+        btnRepair.setBackgroundColor(0xFFE91E63);
+        btnRepair.setPadding(20, 20, 20, 20);
+        btnRepair.setOnClickListener(v -> repairServiceFault());
+        mainLayout.addView(btnRepair);
         
         // 日志显示
         tvLog = new TextView(this);
@@ -278,6 +289,27 @@ public class SimpleMainActivity extends Activity {
         Toast.makeText(this, statusDesc, Toast.LENGTH_LONG).show();
         
         Log.d(TAG, "服务状态检查完成: " + status);
+    }
+    
+    /**
+     * 修复服务故障
+     */
+    private void repairServiceFault() {
+        appendLog("开始诊断服务故障...");
+        
+        ServiceRepairHelper.FaultDiagnosis diagnosis = repairHelper.diagnoseFault();
+        
+        // 显示诊断结果
+        appendLog(diagnosis.getSummary());
+        appendLog(diagnosis.getRepairStepsText());
+        
+        // 更新状态显示
+        updateStatus("故障诊断完成: " + diagnosis.faultCause);
+        
+        // 显示Toast提示
+        Toast.makeText(this, "故障诊断完成，请查看日志", Toast.LENGTH_LONG).show();
+        
+        Log.d(TAG, "服务故障诊断完成: " + diagnosis.faultCause);
     }
     
     /**
