@@ -113,19 +113,52 @@ public class MainActivity extends AppCompatActivity {
      * 检查所需权限
      */
     private boolean checkPermissions() {
-        return ContextCompat.checkSelfPermission(this, Manifest.permission.SYSTEM_ALERT_WINDOW) == PackageManager.PERMISSION_GRANTED
-                && ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED
-                && Settings.canDrawOverlays(this);
+        // 检查悬浮窗权限
+        boolean overlayPermission = Settings.canDrawOverlays(this);
+        
+        // 检查Android 13+媒体权限
+        boolean mediaPermissions = true;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            mediaPermissions = ContextCompat.checkSelfPermission(this, Manifest.permission.READ_MEDIA_IMAGES) == PackageManager.PERMISSION_GRANTED
+                    && ContextCompat.checkSelfPermission(this, Manifest.permission.READ_MEDIA_VIDEO) == PackageManager.PERMISSION_GRANTED
+                    && ContextCompat.checkSelfPermission(this, Manifest.permission.READ_MEDIA_AUDIO) == PackageManager.PERMISSION_GRANTED;
+        } else {
+            // Android 12及以下检查存储权限
+            mediaPermissions = ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED
+                    && ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED;
+        }
+        
+        // 检查其他必要权限
+        boolean otherPermissions = ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS) == PackageManager.PERMISSION_GRANTED
+                && ContextCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED;
+        
+        return overlayPermission && mediaPermissions && otherPermissions;
     }
     
     /**
      * 请求权限
      */
     private void requestPermissions() {
-        String[] permissions = {
-                Manifest.permission.WRITE_EXTERNAL_STORAGE,
-                Manifest.permission.READ_EXTERNAL_STORAGE
-        };
+        // 根据Android版本请求不同的权限
+        String[] permissions;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            // Android 13+请求媒体权限
+            permissions = new String[]{
+                    Manifest.permission.READ_MEDIA_IMAGES,
+                    Manifest.permission.READ_MEDIA_VIDEO,
+                    Manifest.permission.READ_MEDIA_AUDIO,
+                    Manifest.permission.POST_NOTIFICATIONS,
+                    Manifest.permission.RECORD_AUDIO
+            };
+        } else {
+            // Android 12及以下请求存储权限
+            permissions = new String[]{
+                    Manifest.permission.WRITE_EXTERNAL_STORAGE,
+                    Manifest.permission.READ_EXTERNAL_STORAGE,
+                    Manifest.permission.POST_NOTIFICATIONS,
+                    Manifest.permission.RECORD_AUDIO
+            };
+        }
         
         ActivityCompat.requestPermissions(this, permissions, REQUEST_CODE_PERMISSIONS);
         
