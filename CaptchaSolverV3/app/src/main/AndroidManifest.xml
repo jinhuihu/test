@@ -67,10 +67,7 @@
             android:name=".ScreenMonitorService"
             android:enabled="true"
             android:exported="false"
-            android:foregroundServiceType="specialUse">
-            <property
-                android:name="android.app.PROPERTY_SPECIAL_USE_FGS_SUBTYPE"
-                android:value="媒体投影" />
+            android:foregroundServiceType="mediaProjection">
         </service>
 
         <!-- 无障碍服务 -->
