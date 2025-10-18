@@ -26,8 +26,29 @@ jobs:
     - name: 设置Android SDK
       uses: android-actions/setup-android@v3
       
+    - name: 检查文件结构
+      run: |
+        echo "当前目录内容："
+        ls -la
+        echo "CaptchaSolverV3目录内容："
+        ls -la CaptchaSolverV3/ || echo "CaptchaSolverV3目录不存在"
+        
     - name: 授予Gradlew执行权限
-      run: chmod +x CaptchaSolverV3/gradlew
+      run: |
+        if [ -f "CaptchaSolverV3/gradlew" ]; then
+          chmod +x CaptchaSolverV3/gradlew
+          echo "gradlew权限设置成功"
+        else
+          echo "错误：找不到CaptchaSolverV3/gradlew文件"
+          exit 1
+        fi
+      
+    - name: 下载Gradle Wrapper JAR
+      run: |
+        cd CaptchaSolverV3
+        curl -L -o gradle/wrapper/gradle-wrapper.jar https://services.gradle.org/distributions/gradle-8.0-wrapper.jar || \
+        curl -L -o gradle/wrapper/gradle-wrapper.jar https://github.com/gradle/gradle/raw/v8.0.0/gradle/wrapper/gradle-wrapper.jar || \
+        curl -L -o gradle/wrapper/gradle-wrapper.jar https://raw.githubusercontent.com/gradle/gradle/v8.0.0/gradle/wrapper/gradle-wrapper.jar
       
     - name: 使用Gradle编译Debug APK
       run: |

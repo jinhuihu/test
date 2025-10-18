@@ -14,6 +14,13 @@
     
     <!-- 网络权限（用于ML Kit） -->
     <uses-permission android:name="android.permission.INTERNET" />
+    
+    <!-- Android 15+ 权限 -->
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_SPECIAL_USE" />
+    
+    <!-- 媒体投影权限 -->
+    <uses-permission android:name="android.permission.RECORD_AUDIO" />
 
     <application
         android:allowBackup="true"
@@ -24,7 +31,7 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.CaptchaSolverV3"
-        tools:targetApi="31">
+        tools:targetApi="35">
         
         <!-- 主Activity -->
         <activity
@@ -42,14 +49,22 @@
             android:name=".FloatingWindowService"
             android:enabled="true"
             android:exported="false"
-            android:foregroundServiceType="mediaProjection" />
+            android:foregroundServiceType="specialUse">
+            <property
+                android:name="android.app.PROPERTY_SPECIAL_USE_FGS_SUBTYPE"
+                android:value="媒体投影" />
+        </service>
 
         <!-- 屏幕监控服务 -->
         <service
             android:name=".ScreenMonitorService"
             android:enabled="true"
             android:exported="false"
-            android:foregroundServiceType="mediaProjection" />
+            android:foregroundServiceType="specialUse">
+            <property
+                android:name="android.app.PROPERTY_SPECIAL_USE_FGS_SUBTYPE"
+                android:value="媒体投影" />
+        </service>
 
         <!-- 无障碍服务 -->
         <service
