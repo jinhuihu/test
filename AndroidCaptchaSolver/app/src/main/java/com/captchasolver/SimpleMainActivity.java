@@ -24,10 +24,12 @@ public class SimpleMainActivity extends Activity {
     private Button btnTriggerManually;
     private Button btnFloatWindow;
     private Button btnDebugTest;
+    private Button btnCheckStatus;
     private TextView tvStatus;
     private TextView tvLog;
     
     private static SimpleMainActivity instance;
+    private ServiceHealthChecker healthChecker;
     
     @Override
     protected void onCreate(Bundle savedInstanceState) {
