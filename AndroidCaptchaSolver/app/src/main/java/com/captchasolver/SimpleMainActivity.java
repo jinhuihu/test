@@ -134,7 +134,7 @@ public class SimpleMainActivity extends Activity {
         
         // 调试测试按钮
         btnDebugTest = new Button(this);
-        btnDebugTest.setText("调试测试（点击所有元素）");
+        btnDebugTest.setText("简单测试（点击所有元素）");
         btnDebugTest.setTextColor(0xFFFFFFFF);
         btnDebugTest.setBackgroundColor(0xFFFF5722);
         btnDebugTest.setPadding(20, 20, 20, 20);
@@ -225,7 +225,7 @@ public class SimpleMainActivity extends Activity {
     }
     
     /**
-     * 调试测试
+     * 简单测试
      */
     private void debugTest() {
         if (!isAccessibilityServiceEnabled()) {
@@ -234,10 +234,10 @@ public class SimpleMainActivity extends Activity {
             return;
         }
         
-        appendLog("开始调试测试...");
-        Toast.makeText(this, "开始调试测试，请查看日志", Toast.LENGTH_SHORT).show();
+        appendLog("开始简单测试...");
+        Toast.makeText(this, "开始简单测试，请查看日志", Toast.LENGTH_SHORT).show();
         
-        // 通知 Service 触发调试识别
+        // 通知 Service 触发简单测试识别
         CaptchaService.triggerCaptchaRecognition();
     }
     

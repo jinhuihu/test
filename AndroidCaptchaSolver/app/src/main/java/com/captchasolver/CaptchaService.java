@@ -20,7 +20,7 @@ public class CaptchaService extends AccessibilityService {
     
     private static CaptchaService instance;
     
-    private DebugCaptchaSolver captchaSolver;
+    private SimpleTestSolver captchaSolver;
     private Handler mainHandler;
     
     // 验证码相关常量
@@ -37,12 +37,12 @@ public class CaptchaService extends AccessibilityService {
         // 初始化 Handler
         mainHandler = new Handler(Looper.getMainLooper());
         
-        // 初始化调试识别器（用于排查问题）
-        captchaSolver = new DebugCaptchaSolver(this);
+        // 初始化简单测试识别器（用于排查问题）
+        captchaSolver = new SimpleTestSolver(this);
         captchaSolver.setAccessibilityService(this);
         
-        Log.d(TAG, "验证码识别服务已创建（使用调试识别器）");
-        logToActivity("调试验证码识别服务已创建");
+        Log.d(TAG, "验证码识别服务已创建（使用简单测试识别器）");
+        logToActivity("简单测试识别服务已创建");
     }
     
     @Override
@@ -59,6 +59,7 @@ public class CaptchaService extends AccessibilityService {
         
         setServiceInfo(info);
         Log.d(TAG, "验证码识别服务已连接");
+        logToActivity("✓ 无障碍服务已连接");
     }
     
     @Override
