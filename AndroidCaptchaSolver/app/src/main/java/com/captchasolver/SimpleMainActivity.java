@@ -2,6 +2,8 @@ package com.captchasolver;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.provider.Settings;
 import android.util.Log;
@@ -20,6 +22,7 @@ public class SimpleMainActivity extends Activity {
     private Button btnStop;
     private Button btnPermissions;
     private Button btnTriggerManually;
+    private Button btnFloatWindow;
     private TextView tvStatus;
     private TextView tvLog;
     
@@ -120,6 +123,14 @@ public class SimpleMainActivity extends Activity {
         btnTriggerManually.setPadding(20, 20, 20, 20);
         mainLayout.addView(btnTriggerManually);
         
+        // 悬浮窗按钮
+        btnFloatWindow = new Button(this);
+        btnFloatWindow.setText("打开悬浮窗");
+        btnFloatWindow.setTextColor(0xFFFFFFFF);
+        btnFloatWindow.setBackgroundColor(0xFF9C27B0);
+        btnFloatWindow.setPadding(20, 20, 20, 20);
+        mainLayout.addView(btnFloatWindow);
+        
         // 日志显示
         tvLog = new TextView(this);
         tvLog.setText("日志信息将显示在这里...\n");
@@ -142,6 +153,7 @@ public class SimpleMainActivity extends Activity {
         btnStop.setOnClickListener(v -> stopService());
         btnPermissions.setOnClickListener(v -> openAccessibilitySettings());
         btnTriggerManually.setOnClickListener(v -> triggerManually());
+        btnFloatWindow.setOnClickListener(v -> openFloatWindow());
     }
     
     /**
@@ -171,6 +183,35 @@ public class SimpleMainActivity extends Activity {
                 appendLog(message);
             }
         });
+    }
+    
+    /**
+     * 打开悬浮窗
+     */
+    private void openFloatWindow() {
+        // 检查悬浮窗权限
+        if (!Settings.canDrawOverlays(this)) {
+            Toast.makeText(this, "需要悬浮窗权限", Toast.LENGTH_LONG).show();
+            requestOverlayPermission();
+            return;
+        }
+        
+        // 启动悬浮窗服务
+        FloatWindowService.startFloatWindow(this);
+        appendLog("悬浮窗已启动");
+        Toast.makeText(this, "悬浮窗已启动", Toast.LENGTH_SHORT).show();
+    }
+    
+    /**
+     * 请求悬浮窗权限
+     */
+    private void requestOverlayPermission() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            Intent intent = new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION);
+            intent.setData(Uri.parse("package:" + getPackageName()));
+            startActivity(intent);
+            appendLog("正在请求悬浮窗权限...");
+        }
     }
     
     /**

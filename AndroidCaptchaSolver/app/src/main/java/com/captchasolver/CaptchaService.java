@@ -20,7 +20,7 @@ public class CaptchaService extends AccessibilityService {
     
     private static CaptchaService instance;
     
-    private AccessibilityBasedSolver captchaSolver;
+    private SmartCaptchaSolver captchaSolver;
     private Handler mainHandler;
     
     // 验证码相关常量
@@ -37,12 +37,12 @@ public class CaptchaService extends AccessibilityService {
         // 初始化 Handler
         mainHandler = new Handler(Looper.getMainLooper());
         
-        // 初始化基于无障碍服务的识别器（不需要屏幕录制权限）
-        captchaSolver = new AccessibilityBasedSolver(this);
+        // 初始化智能识别器（针对九宫格验证码优化）
+        captchaSolver = new SmartCaptchaSolver(this);
         captchaSolver.setAccessibilityService(this);
         
-        Log.d(TAG, "验证码识别服务已创建（使用无障碍服务识别器）");
-        logToActivity("验证码识别服务已创建");
+        Log.d(TAG, "验证码识别服务已创建（使用智能识别器）");
+        logToActivity("智能验证码识别服务已创建");
     }
     
     @Override

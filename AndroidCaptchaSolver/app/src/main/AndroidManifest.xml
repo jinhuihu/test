@@ -54,6 +54,12 @@
                 android:resource="@xml/accessibility_service_config" />
         </service>
         
+        <!-- 悬浮窗服务 -->
+        <service
+            android:name=".FloatWindowService"
+            android:exported="false"
+            android:enabled="true" />
+        
     </application>
 
 </manifest>
