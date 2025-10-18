@@ -19,12 +19,17 @@ public class SimpleMainActivity extends Activity {
     private Button btnStart;
     private Button btnStop;
     private Button btnPermissions;
+    private Button btnTriggerManually;
     private TextView tvStatus;
     private TextView tvLog;
+    
+    private static SimpleMainActivity instance;
     
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        
+        instance = this;
         
         // 创建简单的界面
         createSimpleUI();
@@ -33,6 +38,10 @@ public class SimpleMainActivity extends Activity {
         setupClickListeners();
         
         Log.d(TAG, "简化版验证码识别助手已启动");
+    }
+    
+    public static SimpleMainActivity getInstance() {
+        return instance;
     }
     
     /**
@@ -103,6 +112,14 @@ public class SimpleMainActivity extends Activity {
         btnPermissions.setPadding(20, 20, 20, 20);
         mainLayout.addView(btnPermissions);
         
+        // 手动触发按钮
+        btnTriggerManually = new Button(this);
+        btnTriggerManually.setText("手动触发识别（测试）");
+        btnTriggerManually.setTextColor(0xFFFFFFFF);
+        btnTriggerManually.setBackgroundColor(0xFFFF9800);
+        btnTriggerManually.setPadding(20, 20, 20, 20);
+        mainLayout.addView(btnTriggerManually);
+        
         // 日志显示
         tvLog = new TextView(this);
         tvLog.setText("日志信息将显示在这里...\n");
@@ -124,6 +141,36 @@ public class SimpleMainActivity extends Activity {
         btnStart.setOnClickListener(v -> startService());
         btnStop.setOnClickListener(v -> stopService());
         btnPermissions.setOnClickListener(v -> openAccessibilitySettings());
+        btnTriggerManually.setOnClickListener(v -> triggerManually());
+    }
+    
+    /**
+     * 手动触发验证码识别
+     */
+    private void triggerManually() {
+        if (!isAccessibilityServiceEnabled()) {
+            Toast.makeText(this, "请先启用无障碍服务", Toast.LENGTH_LONG).show();
+            openAccessibilitySettings();
+            return;
+        }
+        
+        appendLog("手动触发验证码识别...");
+        Toast.makeText(this, "正在识别验证码，请查看日志", Toast.LENGTH_SHORT).show();
+        
+        // 通知 Service 触发识别
+        CaptchaService.triggerCaptchaRecognition();
+    }
+    
+    /**
+     * 更新日志（供 Service 调用）
+     */
+    public void updateLog(final String message) {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                appendLog(message);
+            }
+        });
     }
     
     /**
