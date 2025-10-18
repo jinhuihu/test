@@ -4,6 +4,8 @@ import android.accessibilityservice.AccessibilityService;
 import android.accessibilityservice.AccessibilityServiceInfo;
 import android.graphics.Bitmap;
 import android.graphics.Rect;
+import android.os.Handler;
+import android.os.Looper;
 import android.util.Log;
 import android.view.accessibility.AccessibilityEvent;
 import android.view.accessibility.AccessibilityNodeInfo;
@@ -17,6 +19,7 @@ public class CaptchaService extends AccessibilityService {
     private static final String TAG = "CaptchaService";
     
     private RealCaptchaSolver captchaSolver;
+    private Handler mainHandler;
     
     // 验证码相关常量
     private static final String CAPTCHA_PACKAGE = "com.android.chrome"; // 浏览器包名
@@ -26,6 +29,9 @@ public class CaptchaService extends AccessibilityService {
     @Override
     public void onCreate() {
         super.onCreate();
+        
+        // 初始化 Handler
+        mainHandler = new Handler(Looper.getMainLooper());
         
         // 初始化真实的验证码识别器
         captchaSolver = new RealCaptchaSolver(this);
@@ -60,8 +66,11 @@ public class CaptchaService extends AccessibilityService {
         // 检查是否在目标应用中
         if (packageName.contains("chrome") || packageName.contains("browser")) {
             // 延迟执行，确保界面完全加载
-            getMainHandler().postDelayed(() -> {
-                captchaSolver.processCaptcha();
+            mainHandler.postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    captchaSolver.processCaptcha();
+                }
             }, 1000);
         }
     }
