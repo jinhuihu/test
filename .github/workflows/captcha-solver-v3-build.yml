@@ -49,22 +49,20 @@ jobs:
           echo "错误：找不到CaptchaSolverV3/gradlew文件"
           echo "尝试创建gradlew文件..."
           mkdir -p CaptchaSolverV3
-          cat > CaptchaSolverV3/gradlew << 'EOF'
-#!/bin/sh
-APP_HOME=$( cd "${0%/*}" && pwd -P )
-CLASSPATH=$APP_HOME/gradle/wrapper/gradle-wrapper.jar
-if [ -n "$JAVA_HOME" ] ; then
-    JAVACMD=$JAVA_HOME/bin/java
-else
-    JAVACMD=java
-fi
-DEFAULT_JVM_OPTS='"-Xmx64m" "-Xms64m"'
-exec "$JAVACMD" $DEFAULT_JVM_OPTS \
-        "-Dorg.gradle.appname=$0" \
-        -classpath "$CLASSPATH" \
-        org.gradle.wrapper.GradleWrapperMain \
-        "$@"
-EOF
+          echo '#!/bin/sh' > CaptchaSolverV3/gradlew
+          echo 'APP_HOME=$( cd "${0%/*}" && pwd -P )' >> CaptchaSolverV3/gradlew
+          echo 'CLASSPATH=$APP_HOME/gradle/wrapper/gradle-wrapper.jar' >> CaptchaSolverV3/gradlew
+          echo 'if [ -n "$JAVA_HOME" ] ; then' >> CaptchaSolverV3/gradlew
+          echo '    JAVACMD=$JAVA_HOME/bin/java' >> CaptchaSolverV3/gradlew
+          echo 'else' >> CaptchaSolverV3/gradlew
+          echo '    JAVACMD=java' >> CaptchaSolverV3/gradlew
+          echo 'fi' >> CaptchaSolverV3/gradlew
+          echo 'DEFAULT_JVM_OPTS="-Xmx64m -Xms64m"' >> CaptchaSolverV3/gradlew
+          echo 'exec "$JAVACMD" $DEFAULT_JVM_OPTS \' >> CaptchaSolverV3/gradlew
+          echo '        "-Dorg.gradle.appname=$0" \' >> CaptchaSolverV3/gradlew
+          echo '        -classpath "$CLASSPATH" \' >> CaptchaSolverV3/gradlew
+          echo '        org.gradle.wrapper.GradleWrapperMain \' >> CaptchaSolverV3/gradlew
+          echo '        "$@"' >> CaptchaSolverV3/gradlew
           chmod +x CaptchaSolverV3/gradlew
           echo "gradlew文件创建成功"
         fi
