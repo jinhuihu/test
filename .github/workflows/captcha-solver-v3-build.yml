@@ -100,11 +100,8 @@ jobs:
     - name: 使用Gradle编译Debug APK
       run: |
         cd CaptchaSolverV3
-        echo "尝试使用gradlew编译..."
-        ./gradlew assembleDebug --stacktrace || {
-          echo "gradlew失败，尝试直接使用gradle命令..."
-          gradle assembleDebug --stacktrace
-        }
+        echo "使用gradlew编译..."
+        ./gradlew assembleDebug --stacktrace
         
     - name: 查找APK文件
       run: |
