@@ -4,6 +4,7 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Rect;
 import android.util.Log;
+import com.google.android.gms.tasks.Tasks;
 import com.google.mlkit.vision.common.InputImage;
 import com.google.mlkit.vision.label.ImageLabel;
 import com.google.mlkit.vision.label.ImageLabeler;
@@ -13,8 +14,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.TimeUnit;
 
 /**
  * 图像识别模块 - 使用 Google ML Kit
@@ -27,7 +26,7 @@ public class ImageRecognizer {
     private ImageLabeler imageLabeler;
     
     // 物体识别的映射表（中文到英文标签）
-    private static final Map<String, String[]> OBJECT_MAPPINGS = new HashMap<>();
+    private static final Map<String, String[]> OBJECT_MAPPINGS = new HashMap<String, String[]>();
     static {
         // 交通工具
         OBJECT_MAPPINGS.put("飞机", new String[]{"airplane", "aircraft", "plane", "jet"});
@@ -80,7 +79,7 @@ public class ImageRecognizer {
      * @return 包含目标物体的图片索引列表
      */
     public List<Integer> findMatchingImages(Bitmap bitmap, String targetObject, List<Rect> gridRegions) {
-        List<Integer> matchingIndices = new ArrayList<>();
+        List<Integer> matchingIndices = new ArrayList<Integer>();
         
         try {
             Log.d(TAG, "开始识别九宫格图片，目标物体: " + targetObject);
@@ -106,7 +105,7 @@ public class ImageRecognizer {
                 
                 if (matches) {
                     Log.d(TAG, "图片 " + i + " 包含目标物体");
-                    matchingIndices.add(i);
+                    matchingIndices.add(Integer.valueOf(i));
                 } else {
                     Log.d(TAG, "图片 " + i + " 不包含目标物体");
                 }
@@ -150,48 +149,31 @@ public class ImageRecognizer {
             // 创建 InputImage
             InputImage image = InputImage.fromBitmap(croppedBitmap, 0);
             
-            // 使用 CountDownLatch 实现同步等待
-            final CountDownLatch latch = new CountDownLatch(1);
-            final boolean[] result = new boolean[1];
+            // 使用 Tasks.await() 同步等待结果
+            List<ImageLabel> labels = Tasks.await(imageLabeler.process(image));
             
-            // 执行图像识别
-            imageLabeler.process(image)
-                .addOnSuccessListener(labels -> {
-                    Log.d(TAG, "图像识别成功，标签数量: " + labels.size());
-                    
-                    // 检查是否包含目标标签
-                    for (ImageLabel label : labels) {
-                        String labelText = label.getText().toLowerCase();
-                        float confidence = label.getConfidence();
-                        
-                        Log.d(TAG, "标签: " + labelText + " 置信度: " + confidence);
-                        
-                        // 检查是否匹配目标标签
-                        for (String targetLabel : targetLabels) {
-                            if (labelText.contains(targetLabel.toLowerCase())) {
-                                Log.d(TAG, "找到匹配标签: " + labelText);
-                                result[0] = true;
-                                break;
-                            }
-                        }
-                        
-                        if (result[0]) break;
+            Log.d(TAG, "图像识别成功，标签数量: " + labels.size());
+            
+            // 检查是否包含目标标签
+            for (ImageLabel label : labels) {
+                String labelText = label.getText().toLowerCase();
+                float confidence = label.getConfidence();
+                
+                Log.d(TAG, "标签: " + labelText + " 置信度: " + confidence);
+                
+                // 检查是否匹配目标标签
+                for (String targetLabel : targetLabels) {
+                    if (labelText.contains(targetLabel.toLowerCase())) {
+                        Log.d(TAG, "找到匹配标签: " + labelText);
+                        croppedBitmap.recycle();
+                        return true;
                     }
-                    
-                    latch.countDown();
-                })
-                .addOnFailureListener(e -> {
-                    Log.e(TAG, "图像识别失败: " + e.getMessage(), e);
-                    latch.countDown();
-                });
-            
-            // 等待识别完成（最多 5 秒）
-            latch.await(5, TimeUnit.SECONDS);
+                }
+            }
             
             // 回收临时 Bitmap
             croppedBitmap.recycle();
-            
-            return result[0];
+            return false;
             
         } catch (Exception e) {
             Log.e(TAG, "识别图片区域时出错: " + e.getMessage(), e);
@@ -205,7 +187,7 @@ public class ImageRecognizer {
      * @return 九宫格的区域列表
      */
     public List<Rect> detectGridRegions(Bitmap bitmap) {
-        List<Rect> gridRegions = new ArrayList<>();
+        List<Rect> gridRegions = new ArrayList<Rect>();
         
         try {
             int width = bitmap.getWidth();
@@ -234,11 +216,13 @@ public class ImageRecognizer {
                     int right = left + cellWidth;
                     int bottom = top + cellHeight;
                     
-                    Rect region = new Rect(left, top, right, bottom);
-                    gridRegions.add(region);
+                    Rect rect = new Rect(left, top, right, bottom);
+                    gridRegions.add(rect);
                     
                     Log.d(TAG, String.format("格子 [%d,%d]: (%d,%d,%d,%d)", 
-                        row, col, left, top, right, bottom));
+                        Integer.valueOf(row), Integer.valueOf(col), 
+                        Integer.valueOf(left), Integer.valueOf(top), 
+                        Integer.valueOf(right), Integer.valueOf(bottom)));
                 }
             }
             

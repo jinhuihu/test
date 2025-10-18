@@ -4,6 +4,7 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Rect;
 import android.util.Log;
+import com.google.android.gms.tasks.Tasks;
 import com.google.mlkit.vision.common.InputImage;
 import com.google.mlkit.vision.text.Text;
 import com.google.mlkit.vision.text.TextRecognition;
@@ -11,8 +12,6 @@ import com.google.mlkit.vision.text.TextRecognizer;
 import com.google.mlkit.vision.text.chinese.ChineseTextRecognizerOptions;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.TimeUnit;
 
 /**
  * OCR 文字识别模块 - 使用 Google ML Kit
@@ -55,30 +54,17 @@ public class CaptchaOCR {
             // 创建 InputImage
             InputImage image = InputImage.fromBitmap(bitmap, 0);
             
-            // 使用 CountDownLatch 实现同步等待
-            final CountDownLatch latch = new CountDownLatch(1);
-            final String[] result = new String[1];
+            // 使用 Tasks.await() 同步等待结果
+            Text visionText = Tasks.await(textRecognizer.process(image));
             
-            // 执行文字识别
-            textRecognizer.process(image)
-                .addOnSuccessListener(visionText -> {
-                    Log.d(TAG, "文字识别成功");
-                    result[0] = extractTargetFromText(visionText);
-                    latch.countDown();
-                })
-                .addOnFailureListener(e -> {
-                    Log.e(TAG, "文字识别失败: " + e.getMessage(), e);
-                    latch.countDown();
-                });
+            Log.d(TAG, "文字识别成功");
+            String result = extractTargetFromText(visionText);
             
-            // 等待识别完成（最多 10 秒）
-            boolean completed = latch.await(10, TimeUnit.SECONDS);
-            
-            if (completed && result[0] != null) {
-                Log.d(TAG, "识别到目标物体: " + result[0]);
-                return result[0];
+            if (result != null) {
+                Log.d(TAG, "识别到目标物体: " + result);
+                return result;
             } else {
-                Log.e(TAG, "识别超时或未找到目标物体");
+                Log.e(TAG, "未找到目标物体");
                 return null;
             }
             
@@ -161,31 +147,22 @@ public class CaptchaOCR {
      */
     public List<String> recognizeAllText(Bitmap bitmap) {
         try {
-            List<String> allText = new ArrayList<>();
+            List<String> allText = new ArrayList<String>();
             
             InputImage image = InputImage.fromBitmap(bitmap, 0);
-            final CountDownLatch latch = new CountDownLatch(1);
+            Text visionText = Tasks.await(textRecognizer.process(image));
             
-            textRecognizer.process(image)
-                .addOnSuccessListener(visionText -> {
-                    for (Text.TextBlock textBlock : visionText.getTextBlocks()) {
-                        for (Text.Line line : textBlock.getLines()) {
-                            allText.add(line.getText());
-                        }
-                    }
-                    latch.countDown();
-                })
-                .addOnFailureListener(e -> {
-                    Log.e(TAG, "识别所有文字失败: " + e.getMessage(), e);
-                    latch.countDown();
-                });
+            for (Text.TextBlock textBlock : visionText.getTextBlocks()) {
+                for (Text.Line line : textBlock.getLines()) {
+                    allText.add(line.getText());
+                }
+            }
             
-            latch.await(10, TimeUnit.SECONDS);
             return allText;
             
         } catch (Exception e) {
             Log.e(TAG, "识别所有文字时出错: " + e.getMessage(), e);
-            return new ArrayList<>();
+            return new ArrayList<String>();
         }
     }
     
