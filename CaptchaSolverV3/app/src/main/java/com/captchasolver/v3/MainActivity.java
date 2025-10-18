@@ -4,6 +4,7 @@ import android.Manifest;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.media.projection.MediaProjectionManager;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -28,6 +29,7 @@ public class MainActivity extends AppCompatActivity {
     private static final int REQUEST_CODE_PERMISSIONS = 1001;
     private static final int REQUEST_CODE_ACCESSIBILITY = 1002;
     private static final int REQUEST_CODE_OVERLAY = 1003;
+    private static final int REQUEST_CODE_MEDIA_PROJECTION = 1004;
     
     private Button btnStartMonitoring;
     private Button btnStopMonitoring;
@@ -41,6 +43,7 @@ public class MainActivity extends AppCompatActivity {
     
     private boolean isMonitoring = false;
     private FloatingWindowService floatingService;
+    private MediaProjectionManager projectionManager;
     
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -49,7 +52,15 @@ public class MainActivity extends AppCompatActivity {
         
         initViews();
         setupListeners();
+        initMediaProjection();
         updateUI();
+    }
+    
+    /**
+     * 初始化媒体投影管理器
+     */
+    private void initMediaProjection() {
+        projectionManager = (MediaProjectionManager) getSystemService(MEDIA_PROJECTION_SERVICE);
     }
     
     /**
@@ -193,19 +204,9 @@ public class MainActivity extends AppCompatActivity {
             return;
         }
         
-        // 启动屏幕监控服务
-        Intent serviceIntent = new Intent(this, ScreenMonitorService.class);
-        serviceIntent.putExtra("start_monitoring", true);
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            startForegroundService(serviceIntent);
-        } else {
-            startService(serviceIntent);
-        }
-        
-        isMonitoring = true;
-        updateUI();
-        addLog("验证码监控已启动");
-        addLog("注意：首次使用需要授予屏幕录制权限");
+        // 请求屏幕录制权限
+        Intent captureIntent = projectionManager.createScreenCaptureIntent();
+        startActivityForResult(captureIntent, REQUEST_CODE_MEDIA_PROJECTION);
     }
     
     /**
@@ -303,6 +304,34 @@ public class MainActivity extends AppCompatActivity {
                 Toast.makeText(this, "悬浮窗权限被拒绝", Toast.LENGTH_SHORT).show();
             }
             updateUI();
+        } else if (requestCode == REQUEST_CODE_MEDIA_PROJECTION) {
+            if (resultCode == Activity.RESULT_OK) {
+                // 屏幕录制权限已授予，启动监控服务
+                startScreenMonitorService(data);
+            } else {
+                Toast.makeText(this, "屏幕录制权限被拒绝", Toast.LENGTH_SHORT).show();
+                addLog("屏幕录制权限被拒绝，无法进行监控");
+            }
         }
+    }
+    
+    /**
+     * 启动屏幕监控服务
+     */
+    private void startScreenMonitorService(Intent mediaProjectionData) {
+        Intent serviceIntent = new Intent(this, ScreenMonitorService.class);
+        serviceIntent.putExtra("start_monitoring", true);
+        serviceIntent.putExtra("media_projection_data", mediaProjectionData);
+        
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            startForegroundService(serviceIntent);
+        } else {
+            startService(serviceIntent);
+        }
+        
+        isMonitoring = true;
+        updateUI();
+        addLog("验证码监控已启动");
+        addLog("屏幕录制权限已授予，开始监控屏幕内容");
     }
 }

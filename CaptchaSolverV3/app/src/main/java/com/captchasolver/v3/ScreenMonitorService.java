@@ -1,5 +1,6 @@
 package com.captchasolver.v3;
 
+import android.app.Activity;
 import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
@@ -112,6 +113,11 @@ public class ScreenMonitorService extends Service {
         startForeground(NOTIFICATION_ID, createNotification());
         
         if (intent != null && intent.getBooleanExtra("start_monitoring", false)) {
+            // 获取MediaProjection数据
+            Intent mediaProjectionData = intent.getParcelableExtra("media_projection_data");
+            if (mediaProjectionData != null) {
+                initializeMediaProjection(mediaProjectionData);
+            }
             startMonitoring();
         }
         
@@ -122,6 +128,18 @@ public class ScreenMonitorService extends Service {
     @Override
     public IBinder onBind(Intent intent) {
         return binder;
+    }
+    
+    /**
+     * 初始化MediaProjection
+     */
+    private void initializeMediaProjection(Intent mediaProjectionData) {
+        try {
+            mediaProjection = projectionManager.getMediaProjection(Activity.RESULT_OK, mediaProjectionData);
+            Log.d(TAG, "MediaProjection初始化成功");
+        } catch (Exception e) {
+            Log.e(TAG, "MediaProjection初始化失败", e);
+        }
     }
     
     /**
