@@ -1,6 +1,7 @@
 apply plugin: 'com.android.application'
 
 android {
+    namespace 'com.captchasolver'
     compileSdkVersion 36
     buildToolsVersion "33.0.0"
 
