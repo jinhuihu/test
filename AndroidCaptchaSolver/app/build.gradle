@@ -28,5 +28,13 @@ android {
 }
 
 dependencies {
-    // 不依赖任何外部库，使用系统内置的Android API
+    // Google ML Kit - 文字识别（OCR）
+    implementation 'com.google.mlkit:text-recognition:16.0.0'
+    implementation 'com.google.mlkit:text-recognition-chinese:16.0.0'
+    
+    // Google ML Kit - 图像标注（物体识别）
+    implementation 'com.google.mlkit:image-labeling:17.0.8'
+    
+    // Google ML Kit - 物体检测
+    implementation 'com.google.mlkit:object-detection:17.0.1'
 }

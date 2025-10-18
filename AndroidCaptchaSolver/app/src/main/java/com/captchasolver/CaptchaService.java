@@ -16,7 +16,7 @@ import java.util.List;
 public class CaptchaService extends AccessibilityService {
     private static final String TAG = "CaptchaService";
     
-    private SimpleCaptchaSolver captchaSolver;
+    private RealCaptchaSolver captchaSolver;
     
     // 验证码相关常量
     private static final String CAPTCHA_PACKAGE = "com.android.chrome"; // 浏览器包名
@@ -27,11 +27,11 @@ public class CaptchaService extends AccessibilityService {
     public void onCreate() {
         super.onCreate();
         
-        // 初始化简化版验证码识别器
-        captchaSolver = new SimpleCaptchaSolver(this);
+        // 初始化真实的验证码识别器
+        captchaSolver = new RealCaptchaSolver(this);
         captchaSolver.setAccessibilityService(this);
         
-        Log.d(TAG, "验证码识别服务已创建");
+        Log.d(TAG, "验证码识别服务已创建（使用真实识别器）");
     }
     
     @Override
@@ -75,6 +75,9 @@ public class CaptchaService extends AccessibilityService {
     @Override
     public void onDestroy() {
         super.onDestroy();
+        if (captchaSolver != null) {
+            captchaSolver.release();
+        }
         Log.d(TAG, "验证码识别服务已销毁");
     }
 }
