@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">验证码识别助手</string>
+    <string name="accessibility_service_description">验证码识别助手可以帮助您自动识别和点击九宫格验证码，提高抢购效率。请确保在无障碍设置中启用此服务。</string>
+    <string name="permission_required">需要以下权限才能正常工作：\n1. 无障碍服务权限\n2. 屏幕录制权限\n3. 存储权限</string>
+    <string name="service_started">验证码识别服务已启动</string>
+    <string name="service_stopped">验证码识别服务已停止</string>
+    <string name="captcha_detected">检测到验证码，开始识别...</string>
+    <string name="captcha_solved">验证码识别完成</string>
+    <string name="error_occurred">发生错误：%s</string>
+</resources>

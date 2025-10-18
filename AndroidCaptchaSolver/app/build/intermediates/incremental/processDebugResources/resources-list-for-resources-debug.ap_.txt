@@ -1,0 +1,1 @@
+/Users/hujinhui/project/sb/AndroidCaptchaSolver/app/build/intermediates/merged_res/debug/layout_activity_main.xml.flat /Users/hujinhui/project/sb/AndroidCaptchaSolver/app/build/intermediates/merged_res/debug/values_values.arsc.flat /Users/hujinhui/project/sb/AndroidCaptchaSolver/app/build/intermediates/merged_res/debug/xml_accessibility_service_config.xml.flat 

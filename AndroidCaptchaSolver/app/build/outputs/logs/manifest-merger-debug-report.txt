@@ -1,0 +1,117 @@
+-- Merging decision tree log ---
+manifest
+ADDED from /Users/hujinhui/project/sb/AndroidCaptchaSolver/app/src/main/AndroidManifest.xml:2:1-51:12
+INJECTED from /Users/hujinhui/project/sb/AndroidCaptchaSolver/app/src/main/AndroidManifest.xml:2:1-51:12
+INJECTED from /Users/hujinhui/project/sb/AndroidCaptchaSolver/app/src/main/AndroidManifest.xml:2:1-51:12
+INJECTED from /Users/hujinhui/project/sb/AndroidCaptchaSolver/app/src/main/AndroidManifest.xml:2:1-51:12
+INJECTED from /Users/hujinhui/project/sb/AndroidCaptchaSolver/app/src/main/AndroidManifest.xml:2:1-51:12
+INJECTED from /Users/hujinhui/project/sb/AndroidCaptchaSolver/app/src/main/AndroidManifest.xml:2:1-51:12
+INJECTED from /Users/hujinhui/project/sb/AndroidCaptchaSolver/app/src/main/AndroidManifest.xml:2:1-51:12
+	package
+		ADDED from /Users/hujinhui/project/sb/AndroidCaptchaSolver/app/src/main/AndroidManifest.xml:3:5-32
+		INJECTED from /Users/hujinhui/project/sb/AndroidCaptchaSolver/app/src/main/AndroidManifest.xml
+		INJECTED from /Users/hujinhui/project/sb/AndroidCaptchaSolver/app/src/main/AndroidManifest.xml
+	android:versionName
+		INJECTED from /Users/hujinhui/project/sb/AndroidCaptchaSolver/app/src/main/AndroidManifest.xml
+		ADDED from /Users/hujinhui/project/sb/AndroidCaptchaSolver/app/src/main/AndroidManifest.xml:2:1-51:12
+		INJECTED from /Users/hujinhui/project/sb/AndroidCaptchaSolver/app/src/main/AndroidManifest.xml
+	android:versionCode
+		INJECTED from /Users/hujinhui/project/sb/AndroidCaptchaSolver/app/src/main/AndroidManifest.xml
+		ADDED from /Users/hujinhui/project/sb/AndroidCaptchaSolver/app/src/main/AndroidManifest.xml:2:1-51:12
+		INJECTED from /Users/hujinhui/project/sb/AndroidCaptchaSolver/app/src/main/AndroidManifest.xml
+	xmlns:android
+		ADDED from /Users/hujinhui/project/sb/AndroidCaptchaSolver/app/src/main/AndroidManifest.xml:2:11-69
+uses-permission#android.permission.SYSTEM_ALERT_WINDOW
+ADDED from /Users/hujinhui/project/sb/AndroidCaptchaSolver/app/src/main/AndroidManifest.xml:6:5-78
+	android:name
+		ADDED from /Users/hujinhui/project/sb/AndroidCaptchaSolver/app/src/main/AndroidManifest.xml:6:22-75
+uses-permission#android.permission.RECORD_AUDIO
+ADDED from /Users/hujinhui/project/sb/AndroidCaptchaSolver/app/src/main/AndroidManifest.xml:7:5-71
+	android:name
+		ADDED from /Users/hujinhui/project/sb/AndroidCaptchaSolver/app/src/main/AndroidManifest.xml:7:22-68
+uses-permission#android.permission.WRITE_EXTERNAL_STORAGE
+ADDED from /Users/hujinhui/project/sb/AndroidCaptchaSolver/app/src/main/AndroidManifest.xml:8:5-81
+	android:name
+		ADDED from /Users/hujinhui/project/sb/AndroidCaptchaSolver/app/src/main/AndroidManifest.xml:8:22-78
+uses-permission#android.permission.READ_EXTERNAL_STORAGE
+ADDED from /Users/hujinhui/project/sb/AndroidCaptchaSolver/app/src/main/AndroidManifest.xml:9:5-80
+	android:name
+		ADDED from /Users/hujinhui/project/sb/AndroidCaptchaSolver/app/src/main/AndroidManifest.xml:9:22-77
+uses-permission#android.permission.INTERNET
+ADDED from /Users/hujinhui/project/sb/AndroidCaptchaSolver/app/src/main/AndroidManifest.xml:10:5-67
+	android:name
+		ADDED from /Users/hujinhui/project/sb/AndroidCaptchaSolver/app/src/main/AndroidManifest.xml:10:22-64
+uses-permission#android.permission.ACCESS_NETWORK_STATE
+ADDED from /Users/hujinhui/project/sb/AndroidCaptchaSolver/app/src/main/AndroidManifest.xml:11:5-79
+	android:name
+		ADDED from /Users/hujinhui/project/sb/AndroidCaptchaSolver/app/src/main/AndroidManifest.xml:11:22-76
+uses-permission#android.permission.FOREGROUND_SERVICE
+ADDED from /Users/hujinhui/project/sb/AndroidCaptchaSolver/app/src/main/AndroidManifest.xml:14:5-77
+	android:name
+		ADDED from /Users/hujinhui/project/sb/AndroidCaptchaSolver/app/src/main/AndroidManifest.xml:14:22-74
+uses-permission#android.permission.BIND_ACCESSIBILITY_SERVICE
+ADDED from /Users/hujinhui/project/sb/AndroidCaptchaSolver/app/src/main/AndroidManifest.xml:17:5-85
+	android:name
+		ADDED from /Users/hujinhui/project/sb/AndroidCaptchaSolver/app/src/main/AndroidManifest.xml:17:22-82
+application
+ADDED from /Users/hujinhui/project/sb/AndroidCaptchaSolver/app/src/main/AndroidManifest.xml:19:5-49:19
+	android:label
+		ADDED from /Users/hujinhui/project/sb/AndroidCaptchaSolver/app/src/main/AndroidManifest.xml:22:9-41
+	android:icon
+		ADDED from /Users/hujinhui/project/sb/AndroidCaptchaSolver/app/src/main/AndroidManifest.xml:21:9-43
+	android:allowBackup
+		ADDED from /Users/hujinhui/project/sb/AndroidCaptchaSolver/app/src/main/AndroidManifest.xml:20:9-35
+	android:theme
+		ADDED from /Users/hujinhui/project/sb/AndroidCaptchaSolver/app/src/main/AndroidManifest.xml:23:9-40
+activity#com.captchasolver.SimpleMainActivity
+ADDED from /Users/hujinhui/project/sb/AndroidCaptchaSolver/app/src/main/AndroidManifest.xml:26:9-34:20
+	android:launchMode
+		ADDED from /Users/hujinhui/project/sb/AndroidCaptchaSolver/app/src/main/AndroidManifest.xml:29:13-43
+	android:exported
+		ADDED from /Users/hujinhui/project/sb/AndroidCaptchaSolver/app/src/main/AndroidManifest.xml:28:13-36
+	android:name
+		ADDED from /Users/hujinhui/project/sb/AndroidCaptchaSolver/app/src/main/AndroidManifest.xml:27:13-47
+intent-filter#action:name:android.intent.action.MAIN+category:name:android.intent.category.LAUNCHER
+ADDED from /Users/hujinhui/project/sb/AndroidCaptchaSolver/app/src/main/AndroidManifest.xml:30:13-33:29
+action#android.intent.action.MAIN
+ADDED from /Users/hujinhui/project/sb/AndroidCaptchaSolver/app/src/main/AndroidManifest.xml:31:17-69
+	android:name
+		ADDED from /Users/hujinhui/project/sb/AndroidCaptchaSolver/app/src/main/AndroidManifest.xml:31:25-66
+category#android.intent.category.LAUNCHER
+ADDED from /Users/hujinhui/project/sb/AndroidCaptchaSolver/app/src/main/AndroidManifest.xml:32:17-77
+	android:name
+		ADDED from /Users/hujinhui/project/sb/AndroidCaptchaSolver/app/src/main/AndroidManifest.xml:32:27-74
+service#com.captchasolver.CaptchaService
+ADDED from /Users/hujinhui/project/sb/AndroidCaptchaSolver/app/src/main/AndroidManifest.xml:37:9-47:19
+	android:exported
+		ADDED from /Users/hujinhui/project/sb/AndroidCaptchaSolver/app/src/main/AndroidManifest.xml:39:13-37
+	android:permission
+		ADDED from /Users/hujinhui/project/sb/AndroidCaptchaSolver/app/src/main/AndroidManifest.xml:40:13-79
+	android:name
+		ADDED from /Users/hujinhui/project/sb/AndroidCaptchaSolver/app/src/main/AndroidManifest.xml:38:13-43
+intent-filter#action:name:android.accessibilityservice.AccessibilityService
+ADDED from /Users/hujinhui/project/sb/AndroidCaptchaSolver/app/src/main/AndroidManifest.xml:41:13-43:29
+action#android.accessibilityservice.AccessibilityService
+ADDED from /Users/hujinhui/project/sb/AndroidCaptchaSolver/app/src/main/AndroidManifest.xml:42:17-92
+	android:name
+		ADDED from /Users/hujinhui/project/sb/AndroidCaptchaSolver/app/src/main/AndroidManifest.xml:42:25-89
+meta-data#android.accessibilityservice
+ADDED from /Users/hujinhui/project/sb/AndroidCaptchaSolver/app/src/main/AndroidManifest.xml:44:13-46:72
+	android:resource
+		ADDED from /Users/hujinhui/project/sb/AndroidCaptchaSolver/app/src/main/AndroidManifest.xml:46:17-69
+	android:name
+		ADDED from /Users/hujinhui/project/sb/AndroidCaptchaSolver/app/src/main/AndroidManifest.xml:45:17-60
+uses-sdk
+INJECTED from /Users/hujinhui/project/sb/AndroidCaptchaSolver/app/src/main/AndroidManifest.xml reason: use-sdk injection requested
+INJECTED from /Users/hujinhui/project/sb/AndroidCaptchaSolver/app/src/main/AndroidManifest.xml
+INJECTED from /Users/hujinhui/project/sb/AndroidCaptchaSolver/app/src/main/AndroidManifest.xml
+INJECTED from /Users/hujinhui/project/sb/AndroidCaptchaSolver/app/src/main/AndroidManifest.xml
+INJECTED from /Users/hujinhui/project/sb/AndroidCaptchaSolver/app/src/main/AndroidManifest.xml
+	android:targetSdkVersion
+		INJECTED from /Users/hujinhui/project/sb/AndroidCaptchaSolver/app/src/main/AndroidManifest.xml
+		ADDED from /Users/hujinhui/project/sb/AndroidCaptchaSolver/app/src/main/AndroidManifest.xml
+		INJECTED from /Users/hujinhui/project/sb/AndroidCaptchaSolver/app/src/main/AndroidManifest.xml
+	android:minSdkVersion
+		INJECTED from /Users/hujinhui/project/sb/AndroidCaptchaSolver/app/src/main/AndroidManifest.xml
+		ADDED from /Users/hujinhui/project/sb/AndroidCaptchaSolver/app/src/main/AndroidManifest.xml
+		INJECTED from /Users/hujinhui/project/sb/AndroidCaptchaSolver/app/src/main/AndroidManifest.xml

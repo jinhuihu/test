@@ -1,0 +1,10 @@
+[
+    {
+        "merged": "com.captchasolver.app-merged_res-5:/xml_accessibility_service_config.xml.flat",
+        "source": "com.captchasolver.app-main-7:/xml/accessibility_service_config.xml"
+    },
+    {
+        "merged": "com.captchasolver.app-merged_res-5:/layout_activity_main.xml.flat",
+        "source": "com.captchasolver.app-main-7:/layout/activity_main.xml"
+    }
+]
