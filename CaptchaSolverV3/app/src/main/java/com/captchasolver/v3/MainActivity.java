@@ -195,6 +195,7 @@ public class MainActivity extends AppCompatActivity {
         
         // 启动屏幕监控服务
         Intent serviceIntent = new Intent(this, ScreenMonitorService.class);
+        serviceIntent.putExtra("start_monitoring", true);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             startForegroundService(serviceIntent);
         } else {
@@ -204,6 +205,7 @@ public class MainActivity extends AppCompatActivity {
         isMonitoring = true;
         updateUI();
         addLog("验证码监控已启动");
+        addLog("注意：首次使用需要授予屏幕录制权限");
     }
     
     /**

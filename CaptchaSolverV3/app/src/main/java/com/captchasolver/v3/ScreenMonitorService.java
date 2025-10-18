@@ -134,6 +134,14 @@ public class ScreenMonitorService extends Service {
         }
         
         Log.d(TAG, "开始监控屏幕");
+        
+        // 检查是否有MediaProjection权限
+        if (mediaProjection == null) {
+            Log.w(TAG, "MediaProjection未初始化，需要用户授予屏幕录制权限");
+            // 这里应该通过Intent请求屏幕录制权限，但需要Activity支持
+            // 暂时先启动监控，在captureScreen时会提示用户
+        }
+        
         isMonitoring = true;
         
         // 启动定期检查
