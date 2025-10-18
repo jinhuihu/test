@@ -23,6 +23,7 @@ public class SimpleMainActivity extends Activity {
     private Button btnPermissions;
     private Button btnTriggerManually;
     private Button btnFloatWindow;
+    private Button btnDebugTest;
     private TextView tvStatus;
     private TextView tvLog;
     
@@ -131,6 +132,14 @@ public class SimpleMainActivity extends Activity {
         btnFloatWindow.setPadding(20, 20, 20, 20);
         mainLayout.addView(btnFloatWindow);
         
+        // 调试测试按钮
+        btnDebugTest = new Button(this);
+        btnDebugTest.setText("调试测试（点击所有元素）");
+        btnDebugTest.setTextColor(0xFFFFFFFF);
+        btnDebugTest.setBackgroundColor(0xFFFF5722);
+        btnDebugTest.setPadding(20, 20, 20, 20);
+        mainLayout.addView(btnDebugTest);
+        
         // 日志显示
         tvLog = new TextView(this);
         tvLog.setText("日志信息将显示在这里...\n");
@@ -154,6 +163,7 @@ public class SimpleMainActivity extends Activity {
         btnPermissions.setOnClickListener(v -> openAccessibilitySettings());
         btnTriggerManually.setOnClickListener(v -> triggerManually());
         btnFloatWindow.setOnClickListener(v -> openFloatWindow());
+        btnDebugTest.setOnClickListener(v -> debugTest());
     }
     
     /**
@@ -212,6 +222,23 @@ public class SimpleMainActivity extends Activity {
             startActivity(intent);
             appendLog("正在请求悬浮窗权限...");
         }
+    }
+    
+    /**
+     * 调试测试
+     */
+    private void debugTest() {
+        if (!isAccessibilityServiceEnabled()) {
+            Toast.makeText(this, "请先启用无障碍服务", Toast.LENGTH_LONG).show();
+            openAccessibilitySettings();
+            return;
+        }
+        
+        appendLog("开始调试测试...");
+        Toast.makeText(this, "开始调试测试，请查看日志", Toast.LENGTH_SHORT).show();
+        
+        // 通知 Service 触发调试识别
+        CaptchaService.triggerCaptchaRecognition();
     }
     
     /**

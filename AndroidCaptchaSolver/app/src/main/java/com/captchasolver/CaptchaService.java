@@ -20,7 +20,7 @@ public class CaptchaService extends AccessibilityService {
     
     private static CaptchaService instance;
     
-    private SmartCaptchaSolver captchaSolver;
+    private DebugCaptchaSolver captchaSolver;
     private Handler mainHandler;
     
     // 验证码相关常量
@@ -37,12 +37,12 @@ public class CaptchaService extends AccessibilityService {
         // 初始化 Handler
         mainHandler = new Handler(Looper.getMainLooper());
         
-        // 初始化智能识别器（针对九宫格验证码优化）
-        captchaSolver = new SmartCaptchaSolver(this);
+        // 初始化调试识别器（用于排查问题）
+        captchaSolver = new DebugCaptchaSolver(this);
         captchaSolver.setAccessibilityService(this);
         
-        Log.d(TAG, "验证码识别服务已创建（使用智能识别器）");
-        logToActivity("智能验证码识别服务已创建");
+        Log.d(TAG, "验证码识别服务已创建（使用调试识别器）");
+        logToActivity("调试验证码识别服务已创建");
     }
     
     @Override
@@ -70,26 +70,22 @@ public class CaptchaService extends AccessibilityService {
         
         // 记录所有事件（便于调试）
         Log.d(TAG, "事件: " + eventTypeToString(eventType) + " 包名: " + packageName);
+        logToActivity("事件: " + eventTypeToString(eventType) + " 包名: " + packageName);
         
-        // 检查是否在浏览器中（扩大检测范围）
-        if (packageName.contains("chrome") || 
-            packageName.contains("browser") ||
-            packageName.contains("firefox") ||
-            packageName.contains("UCMobile") ||
-            packageName.contains("tencent.mtt")) {
-            
-            Log.d(TAG, "检测到浏览器应用，准备处理验证码");
-            
-            // 延迟执行，确保界面完全加载
-            mainHandler.removeCallbacksAndMessages(null); // 移除之前的任务
-            mainHandler.postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    Log.d(TAG, "触发验证码识别...");
-                    captchaSolver.processCaptcha();
-                }
-            }, 1500);
-        }
+        // 监听所有应用，包括币安APP
+        Log.d(TAG, "检测到应用: " + packageName + "，准备处理验证码");
+        logToActivity("检测到应用: " + packageName);
+        
+        // 延迟执行，确保界面完全加载
+        mainHandler.removeCallbacksAndMessages(null); // 移除之前的任务
+        mainHandler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                Log.d(TAG, "触发验证码识别...");
+                logToActivity("触发验证码识别...");
+                captchaSolver.processCaptcha();
+            }
+        }, 2000); // 2秒延迟，给币安APP足够时间加载
     }
     
     /**
