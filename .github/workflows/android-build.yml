@@ -1,0 +1,53 @@
+name: Android CI - 编译 APK
+
+on:
+  # 当推送到 main 或 master 分支时自动编译
+  push:
+    branches: [ main, master ]
+  
+  # 允许手动触发工作流
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    
+    steps:
+    # 1. 检出代码
+    - name: 检出代码
+      uses: actions/checkout@v3
+    
+    # 2. 设置 JDK 11
+    - name: 设置 JDK 11
+      uses: actions/setup-java@v3
+      with:
+        java-version: '11'
+        distribution: 'temurin'
+    
+    # 3. 授予 gradlew 执行权限
+    - name: 授予 Gradle 执行权限
+      run: |
+        cd AndroidCaptchaSolver
+        chmod +x gradlew
+    
+    # 4. 编译 Debug APK
+    - name: 编译 Debug APK
+      run: |
+        cd AndroidCaptchaSolver
+        ./gradlew assembleDebug --stacktrace
+    
+    # 5. 上传编译好的 APK
+    - name: 上传 APK
+      uses: actions/upload-artifact@v3
+      with:
+        name: app-debug
+        path: AndroidCaptchaSolver/app/build/outputs/apk/debug/app-debug.apk
+        retention-days: 30
+    
+    # 6. 显示编译成功信息
+    - name: 编译成功
+      run: |
+        echo "✅ APK 编译成功！"
+        echo "📦 在 Actions 页面底部的 Artifacts 部分下载 APK"
+        echo "🔗 访问: https://github.com/${{ github.repository }}/actions"
+
