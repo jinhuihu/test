@@ -41,38 +41,8 @@ jobs:
         path: AndroidCaptchaSolver/app/build/outputs/apk/debug/*.apk
         retention-days: 30
         
-    - name: 获取短提交SHA
-      id: slug
-      run: echo "sha8=$(echo ${{github.sha}} | cut -c1-8)" >> $GITHUB_OUTPUT
-      
-    - name: 重命名APK（可选）
+    - name: 编译成功提示
       run: |
-        cd AndroidCaptchaSolver/app/build/outputs/apk/debug
-        for file in *.apk; do
-          mv "$file" "captcha-solver-${{ steps.slug.outputs.sha8 }}.apk"
-        done
-        
-    - name: 创建Release（推送到main时）
-      if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-      uses: softprops/action-gh-release@v1
-      with:
-        tag_name: v1.0.${{ github.run_number }}
-        name: Release v1.0.${{ github.run_number }}
-        body: |
-          🎉 自动编译版本
-          
-          **修改内容：**
-          - 修复Chrome浏览器事件频繁触发导致无法识别的问题
-          - 添加处理间隔控制，防止重复触发
-          - 只监听窗口状态改变事件
-          
-          **提交信息：**
-          - Commit: ${{ github.sha }}
-          - 作者: ${{ github.actor }}
-          
-          请下载下方的APK文件安装到手机
-        files: AndroidCaptchaSolver/app/build/outputs/apk/debug/*.apk
-        draft: false
-        prerelease: false
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        echo "✅ APK编译成功！"
+        echo "📦 请在Actions页面的Artifacts区域下载 app-debug"
+        echo "📥 下载链接: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
