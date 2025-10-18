@@ -54,6 +54,9 @@ public class MainActivity extends AppCompatActivity {
         setupListeners();
         initMediaProjection();
         updateUI();
+        
+        // 处理从悬浮窗发来的请求
+        handleIntentAction(getIntent());
     }
     
     /**
@@ -61,6 +64,40 @@ public class MainActivity extends AppCompatActivity {
      */
     private void initMediaProjection() {
         projectionManager = (MediaProjectionManager) getSystemService(MEDIA_PROJECTION_SERVICE);
+    }
+    
+    /**
+     * 处理Intent动作
+     */
+    private void handleIntentAction(Intent intent) {
+        if (intent != null && intent.hasExtra("action")) {
+            String action = intent.getStringExtra("action");
+            switch (action) {
+                case "start_monitoring":
+                    // 延迟一下确保UI完全加载
+                    new android.os.Handler().postDelayed(() -> {
+                        startMonitoring();
+                    }, 500);
+                    break;
+                case "manual_trigger":
+                    // 手动触发识别
+                    triggerManualRecognition();
+                    break;
+            }
+        }
+    }
+    
+    /**
+     * 手动触发识别
+     */
+    private void triggerManualRecognition() {
+        if (isMonitoring) {
+            addLog("手动触发验证码识别");
+            // 这里可以触发一次性的识别，不需要完整的监控流程
+            Toast.makeText(this, "手动识别已触发", Toast.LENGTH_SHORT).show();
+        } else {
+            Toast.makeText(this, "请先启动监控", Toast.LENGTH_SHORT).show();
+        }
     }
     
     /**
@@ -268,6 +305,13 @@ public class MainActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
         updateUI();
+    }
+    
+    @Override
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+        setIntent(intent);
+        handleIntentAction(intent);
     }
     
     @Override

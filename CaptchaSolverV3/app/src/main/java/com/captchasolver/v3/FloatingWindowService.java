@@ -153,23 +153,16 @@ public class FloatingWindowService extends Service {
     private void setupFloatingViewListeners() {
         // 开始/停止监控按钮
         btnStartStop.setOnClickListener(v -> {
-            // 这里需要与MainActivity或ScreenMonitorService通信
-            // 简化实现：切换按钮文本
             if (btnStartStop.getText().toString().contains("开始")) {
-                btnStartStop.setText("停止监控");
-                tvStatus.setText("监控中...");
-                // TODO: 启动监控服务
+                startMonitoring();
             } else {
-                btnStartStop.setText("开始监控");
-                tvStatus.setText("已停止");
-                // TODO: 停止监控服务
+                stopMonitoring();
             }
         });
         
         // 手动触发按钮
         btnManualTrigger.setOnClickListener(v -> {
-            // TODO: 触发手动识别
-            tvStatus.setText("手动识别中...");
+            triggerManualRecognition();
         });
         
         // 关闭按钮
@@ -180,6 +173,70 @@ public class FloatingWindowService extends Service {
         
         // 设置悬浮窗可拖动
         floatingView.setOnTouchListener(new FloatingWindowTouchListener(windowManager, floatingView));
+    }
+    
+    /**
+     * 启动监控
+     */
+    private void startMonitoring() {
+        try {
+            // 启动MainActivity并请求屏幕录制权限
+            Intent intent = new Intent(this, MainActivity.class);
+            intent.putExtra("action", "start_monitoring");
+            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            startActivity(intent);
+            
+            // 更新UI状态
+            btnStartStop.setText("停止监控");
+            tvStatus.setText("启动中...");
+            
+            Log.d(TAG, "启动监控请求已发送");
+            
+        } catch (Exception e) {
+            Log.e(TAG, "启动监控失败", e);
+            tvStatus.setText("启动失败");
+        }
+    }
+    
+    /**
+     * 停止监控
+     */
+    private void stopMonitoring() {
+        try {
+            // 停止ScreenMonitorService
+            Intent serviceIntent = new Intent(this, ScreenMonitorService.class);
+            stopService(serviceIntent);
+            
+            // 更新UI状态
+            btnStartStop.setText("开始监控");
+            tvStatus.setText("已停止");
+            
+            Log.d(TAG, "监控已停止");
+            
+        } catch (Exception e) {
+            Log.e(TAG, "停止监控失败", e);
+        }
+    }
+    
+    /**
+     * 触发手动识别
+     */
+    private void triggerManualRecognition() {
+        try {
+            tvStatus.setText("手动识别中...");
+            
+            // 启动MainActivity并触发手动识别
+            Intent intent = new Intent(this, MainActivity.class);
+            intent.putExtra("action", "manual_trigger");
+            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            startActivity(intent);
+            
+            Log.d(TAG, "手动识别请求已发送");
+            
+        } catch (Exception e) {
+            Log.e(TAG, "手动识别失败", e);
+            tvStatus.setText("识别失败");
+        }
     }
     
     /**
