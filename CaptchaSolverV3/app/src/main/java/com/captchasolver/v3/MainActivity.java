@@ -363,19 +363,26 @@ public class MainActivity extends AppCompatActivity {
      * 启动屏幕监控服务
      */
     private void startScreenMonitorService(Intent mediaProjectionData) {
-        Intent serviceIntent = new Intent(this, ScreenMonitorService.class);
-        serviceIntent.putExtra("start_monitoring", true);
-        serviceIntent.putExtra("media_projection_data", mediaProjectionData);
-        
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            startForegroundService(serviceIntent);
-        } else {
-            startService(serviceIntent);
+        try {
+            Intent serviceIntent = new Intent(this, ScreenMonitorService.class);
+            serviceIntent.putExtra("start_monitoring", true);
+            serviceIntent.putExtra("media_projection_data", mediaProjectionData);
+            
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                startForegroundService(serviceIntent);
+            } else {
+                startService(serviceIntent);
+            }
+            
+            isMonitoring = true;
+            updateUI();
+            addLog("验证码监控已启动");
+            addLog("屏幕录制权限已授予，开始监控屏幕内容");
+            addLog("调试：服务启动请求已发送");
+            
+        } catch (Exception e) {
+            addLog("错误：启动监控服务失败 - " + e.getMessage());
+            Log.e("MainActivity", "启动监控服务失败", e);
         }
-        
-        isMonitoring = true;
-        updateUI();
-        addLog("验证码监控已启动");
-        addLog("屏幕录制权限已授予，开始监控屏幕内容");
     }
 }

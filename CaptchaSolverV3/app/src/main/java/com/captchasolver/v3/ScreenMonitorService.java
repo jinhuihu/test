@@ -113,12 +113,18 @@ public class ScreenMonitorService extends Service {
         startForeground(NOTIFICATION_ID, createNotification());
         
         if (intent != null && intent.getBooleanExtra("start_monitoring", false)) {
+            Log.d(TAG, "收到启动监控请求");
             // 获取MediaProjection数据
             Intent mediaProjectionData = intent.getParcelableExtra("media_projection_data");
             if (mediaProjectionData != null) {
+                Log.d(TAG, "MediaProjection数据已接收，开始初始化");
                 initializeMediaProjection(mediaProjectionData);
+            } else {
+                Log.w(TAG, "MediaProjection数据为空");
             }
             startMonitoring();
+        } else {
+            Log.w(TAG, "没有收到启动监控请求或intent为空");
         }
         
         return START_STICKY;
@@ -211,18 +217,22 @@ public class ScreenMonitorService extends Service {
      */
     private void checkScreenContent() {
         if (isProcessing) {
+            Log.d(TAG, "正在处理中，跳过本次检查");
             return;
         }
         
+        Log.d(TAG, "开始检查屏幕内容");
         isProcessing = true;
         
         try {
             // 截取屏幕
+            Log.d(TAG, "开始截取屏幕");
             Bitmap screenshot = captureScreen();
             if (screenshot == null) {
                 Log.w(TAG, "屏幕截图失败");
                 return;
             }
+            Log.d(TAG, "屏幕截图成功，尺寸: " + screenshot.getWidth() + "x" + screenshot.getHeight());
             
             // OCR识别文字
             CompletableFuture<OCRTextRecognizer.OCRResult> ocrFuture = ocrRecognizer.recognizeText(screenshot);
