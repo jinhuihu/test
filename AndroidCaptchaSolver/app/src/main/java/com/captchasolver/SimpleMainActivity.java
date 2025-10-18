@@ -35,11 +35,17 @@ public class SimpleMainActivity extends Activity {
         
         instance = this;
         
+        // 初始化健康检查器
+        healthChecker = new ServiceHealthChecker(this);
+        
         // 创建简单的界面
         createSimpleUI();
         
         // 设置点击监听器
         setupClickListeners();
+        
+        // 检查服务状态
+        checkServiceStatus();
         
         Log.d(TAG, "简化版验证码识别助手已启动");
     }
@@ -140,6 +146,14 @@ public class SimpleMainActivity extends Activity {
         btnDebugTest.setPadding(20, 20, 20, 20);
         mainLayout.addView(btnDebugTest);
         
+        // 检查状态按钮
+        btnCheckStatus = new Button(this);
+        btnCheckStatus.setText("检查服务状态");
+        btnCheckStatus.setTextColor(0xFFFFFFFF);
+        btnCheckStatus.setBackgroundColor(0xFF607D8B);
+        btnCheckStatus.setPadding(20, 20, 20, 20);
+        mainLayout.addView(btnCheckStatus);
+        
         // 日志显示
         tvLog = new TextView(this);
         tvLog.setText("日志信息将显示在这里...\n");
@@ -164,6 +178,7 @@ public class SimpleMainActivity extends Activity {
         btnTriggerManually.setOnClickListener(v -> triggerManually());
         btnFloatWindow.setOnClickListener(v -> openFloatWindow());
         btnDebugTest.setOnClickListener(v -> debugTest());
+        btnCheckStatus.setOnClickListener(v -> checkServiceStatus());
     }
     
     /**
@@ -239,6 +254,28 @@ public class SimpleMainActivity extends Activity {
         
         // 通知 Service 触发简单测试识别
         CaptchaService.triggerCaptchaRecognition();
+    }
+    
+    /**
+     * 检查服务状态
+     */
+    private void checkServiceStatus() {
+        appendLog("检查服务状态...");
+        
+        ServiceHealthChecker.ServiceStatus status = healthChecker.checkAccessibilityServiceStatus();
+        String statusDesc = healthChecker.getServiceStatusDescription();
+        String fixSuggestion = healthChecker.getFixSuggestion();
+        
+        appendLog("服务状态: " + statusDesc);
+        appendLog("修复建议: " + fixSuggestion);
+        
+        // 更新状态显示
+        updateStatus(statusDesc);
+        
+        // 显示Toast提示
+        Toast.makeText(this, statusDesc, Toast.LENGTH_LONG).show();
+        
+        Log.d(TAG, "服务状态检查完成: " + status);
     }
     
     /**
