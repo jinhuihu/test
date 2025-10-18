@@ -26,7 +26,7 @@ public class OCRTextRecognizer {
     
     public OCRTextRecognizer() {
         // 使用中文文字识别器，支持中英文混合识别
-        textRecognizer = TextRecognition.getClient(ChineseTextRecognizerOptions.Builder().build());
+        textRecognizer = TextRecognition.getClient(new ChineseTextRecognizerOptions.Builder().build());
     }
     
     /**
