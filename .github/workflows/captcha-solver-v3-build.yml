@@ -78,10 +78,12 @@ jobs:
         ls -la
         
         echo "下载gradle wrapper jar..."
-        curl -L -o gradle/wrapper/gradle-wrapper.jar https://services.gradle.org/distributions/gradle-8.0-wrapper.jar || \
-        curl -L -o gradle/wrapper/gradle-wrapper.jar https://github.com/gradle/gradle/raw/v8.0.0/gradle/wrapper/gradle-wrapper.jar || \
+        # 尝试多个下载源
         curl -L -o gradle/wrapper/gradle-wrapper.jar https://raw.githubusercontent.com/gradle/gradle/v8.0.0/gradle/wrapper/gradle-wrapper.jar || \
-        curl -L -o gradle/wrapper/gradle-wrapper.jar https://repo1.maven.org/maven2/org/gradle/gradle-wrapper/8.0/gradle-wrapper-8.0.jar
+        curl -L -o gradle/wrapper/gradle-wrapper.jar https://github.com/gradle/gradle/raw/v8.0.0/gradle/wrapper/gradle-wrapper.jar || \
+        curl -L -o gradle/wrapper/gradle-wrapper.jar https://services.gradle.org/distributions/gradle-8.0-wrapper.jar || \
+        curl -L -o gradle/wrapper/gradle-wrapper.jar https://repo1.maven.org/maven2/org/gradle/gradle-wrapper/8.0/gradle-wrapper-8.0.jar || \
+        (echo "所有下载源都失败，使用wget重试..." && wget -O gradle/wrapper/gradle-wrapper.jar https://raw.githubusercontent.com/gradle/gradle/v8.0.0/gradle/wrapper/gradle-wrapper.jar)
         
         echo "验证jar文件下载："
         ls -la gradle/wrapper/gradle-wrapper.jar
@@ -89,12 +91,20 @@ jobs:
         file gradle/wrapper/gradle-wrapper.jar
         
         echo "测试gradle wrapper jar..."
-        java -cp gradle/wrapper/gradle-wrapper.jar org.gradle.wrapper.GradleWrapperMain --version || echo "gradle wrapper测试失败"
+        java -cp gradle/wrapper/gradle-wrapper.jar org.gradle.wrapper.GradleWrapperMain --version || {
+          echo "gradle wrapper测试失败，尝试重新生成..."
+          # 使用gradle wrapper task重新生成
+          gradle wrapper --gradle-version 8.0 || echo "gradle wrapper生成失败"
+        }
       
     - name: 使用Gradle编译Debug APK
       run: |
         cd CaptchaSolverV3
-        ./gradlew assembleDebug --stacktrace
+        echo "尝试使用gradlew编译..."
+        ./gradlew assembleDebug --stacktrace || {
+          echo "gradlew失败，尝试直接使用gradle命令..."
+          gradle assembleDebug --stacktrace
+        }
         
     - name: 查找APK文件
       run: |
