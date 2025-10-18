@@ -1,8 +1,0 @@
-com.captchasolver.app-pngs-0 /Users/hujinhui/project/sb/AndroidCaptchaSolver/app/build/generated/res/pngs/debug
-com.captchasolver.app-resValues-1 /Users/hujinhui/project/sb/AndroidCaptchaSolver/app/build/generated/res/resValues/debug
-com.captchasolver.app-rs-2 /Users/hujinhui/project/sb/AndroidCaptchaSolver/app/build/generated/res/rs/debug
-com.captchasolver.app-mergeDebugResources-3 /Users/hujinhui/project/sb/AndroidCaptchaSolver/app/build/intermediates/incremental/debug/mergeDebugResources/merged.dir
-com.captchasolver.app-mergeDebugResources-4 /Users/hujinhui/project/sb/AndroidCaptchaSolver/app/build/intermediates/incremental/debug/mergeDebugResources/stripped.dir
-com.captchasolver.app-merged_res-5 /Users/hujinhui/project/sb/AndroidCaptchaSolver/app/build/intermediates/merged_res/debug
-com.captchasolver.app-debug-6 /Users/hujinhui/project/sb/AndroidCaptchaSolver/app/src/debug/res
-com.captchasolver.app-main-7 /Users/hujinhui/project/sb/AndroidCaptchaSolver/app/src/main/res

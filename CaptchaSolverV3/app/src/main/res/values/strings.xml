@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">验证码识别助手V3</string>
+    <string name="accessibility_service_description">九宫格验证码智能识别助手，支持OCR文字识别和图像内容分析</string>
+    
+    <!-- 主界面 -->
+    <string name="start_monitoring">开始监控</string>
+    <string name="stop_monitoring">停止监控</string>
+    <string name="show_floating_window">显示悬浮窗</string>
+    <string name="hide_floating_window">隐藏悬浮窗</string>
+    <string name="enable_accessibility">启用无障碍服务</string>
+    <string name="grant_permissions">授予权限</string>
+    
+    <!-- 状态信息 -->
+    <string name="status_ready">准备就绪</string>
+    <string name="status_monitoring">正在监控中...</string>
+    <string name="status_recognizing">识别中...</string>
+    <string name="status_clicking">点击中...</string>
+    
+    <!-- 日志信息 -->
+    <string name="log_started">验证码监控已启动</string>
+    <string name="log_stopped">验证码监控已停止</string>
+    <string name="log_captcha_detected">检测到验证码</string>
+    <string name="log_text_recognized">识别到目标文字: %1$s</string>
+    <string name="log_image_analyzed">分析图片内容完成</string>
+    <string name="log_clicking_images">正在点击符合条件的图片</string>
+    <string name="log_clicking_verify">点击验证按钮</string>
+    <string name="log_completed">验证完成</string>
+    
+    <!-- 错误信息 -->
+    <string name="error_permission_denied">权限被拒绝</string>
+    <string name="error_accessibility_disabled">无障碍服务未启用</string>
+    <string name="error_screen_capture_failed">屏幕录制失败</string>
+    <string name="error_ocr_failed">文字识别失败</string>
+    <string name="error_image_analysis_failed">图像分析失败</string>
+</resources>
