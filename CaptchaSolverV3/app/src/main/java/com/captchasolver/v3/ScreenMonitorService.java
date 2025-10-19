@@ -315,19 +315,21 @@ public class ScreenMonitorService extends Service {
                 .thenRun(() -> {
                     List<Rect> regionsToClick = new ArrayList<>();
                     
+                    Log.d(TAG, "========== 图片识别汇总 ==========");
                     for (int i = 0; i < analysisFutures.size(); i++) {
                         try {
                             ImageContentAnalyzer.ImageAnalysisResult result = analysisFutures.get(i).get();
                             if (result.containsTarget) {
                                 regionsToClick.add(imageRegions.get(i));
-                                Log.d(TAG, "图片 " + i + " 包含目标物体: " + result.bestMatch);
+                                Log.d(TAG, "✅ 图片 " + i + " 包含目标物体: " + result.bestMatch + " (置信度: " + String.format("%.2f", result.confidence) + ")");
+                            } else {
+                                Log.d(TAG, "❌ 图片 " + i + " 不包含目标物体 (识别到: " + result.detectedObjects + ")");
                             }
                         } catch (Exception e) {
                             Log.e(TAG, "获取图片分析结果失败", e);
                         }
                     }
-                    
-                    Log.d(TAG, "需要点击 " + regionsToClick.size() + " 个图片区域");
+                    Log.d(TAG, "========== 需要点击 " + regionsToClick.size() + " 个图片区域 ==========");
                     
                     // 执行点击操作
                     captchaClicker.clickImageRegions(regionsToClick)

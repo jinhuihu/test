@@ -19,7 +19,7 @@ import java.util.concurrent.CompletableFuture;
 public class ImageContentAnalyzer {
     
     private static final String TAG = "ImageContentAnalyzer";
-    private static final float MIN_CONFIDENCE = 0.5f; // 最小置信度阈值
+    private static final float MIN_CONFIDENCE = 0.65f; // 最小置信度阈值（提高到65%以减少误报）
     
     /**
      * 分析图像内容，判断是否包含目标物体
@@ -63,26 +63,34 @@ public class ImageContentAnalyzer {
         // 获取目标物体的英文名称
         String englishTarget = getEnglishName(targetObject);
         
+        Log.d(TAG, "===== 开始分析图片，目标物体: " + targetObject + " (英文: " + englishTarget + ") =====");
+        
         for (ImageLabel label : labels) {
             String labelText = label.getText().toLowerCase();
             float confidence = label.getConfidence();
             
-            Log.d(TAG, "标签: " + labelText + " 置信度: " + confidence);
+            Log.d(TAG, "  标签: " + labelText + " 置信度: " + String.format("%.2f", confidence));
             
             // 只考虑置信度较高的标签
             if (confidence >= MIN_CONFIDENCE) {
                 detectedObjects.add(labelText + " (" + String.format("%.2f", confidence) + ")");
                 
                 // 检查是否匹配目标物体
-                if (matchesTarget(labelText, targetObject, englishTarget)) {
+                boolean isMatch = matchesTarget(labelText, targetObject, englishTarget);
+                if (isMatch) {
                     containsTarget = true;
                     if (confidence > maxConfidence) {
                         maxConfidence = confidence;
                         bestMatch = labelText;
                     }
+                    Log.d(TAG, "  ✅ 匹配成功！标签: " + labelText + " 匹配目标: " + targetObject);
                 }
+            } else {
+                Log.d(TAG, "  ⚠️ 置信度过低，跳过");
             }
         }
+        
+        Log.d(TAG, "===== 分析结果: " + (containsTarget ? "包含目标物体" : "不包含目标物体") + " =====");
         
         return new ImageAnalysisResult(detectedObjects, containsTarget, maxConfidence, bestMatch);
     }
