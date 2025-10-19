@@ -74,18 +74,20 @@ public class OCRTextRecognizer {
             // 检查是否是验证码提示文字
             if (isCaptchaPrompt(blockText)) {
                 hasCaptchaPrompt = true;
-                Log.d(TAG, "检测到验证码提示: " + blockText);
+                Log.d(TAG, "✅ 检测到验证码提示: " + blockText);
             }
             
             // 检查是否是目标物体文字
             if (isTargetObject(blockText)) {
                 targetObject = blockText.trim();
-                Log.d(TAG, "检测到目标物体: " + targetObject);
+                Log.d(TAG, "✅ 检测到目标物体: " + targetObject);
             }
             
             // 保存文本元素
             elements.add(new TextElement(blockText, blockBounds));
         }
+        
+        Log.d(TAG, "解析结果 - hasCaptchaPrompt: " + hasCaptchaPrompt + ", targetObject: " + targetObject);
         
         return new OCRResult(elements, targetObject, hasCaptchaPrompt);
     }
