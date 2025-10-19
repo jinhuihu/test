@@ -98,12 +98,24 @@ public class OCRTextRecognizer {
      * @return 是否是验证码提示
      */
     private boolean isCaptchaPrompt(String text) {
+        String cleanText = text.trim();
+        
+        // 检查是否包含关键短语：'请选择所有' 和 '图片'
+        boolean hasStart = cleanText.contains("请选择所有") || cleanText.contains("请选择");
+        boolean hasEnd = cleanText.contains("图片");
+        
+        // 如果同时包含这两个关键词，则认为是验证码提示
+        if (hasStart && hasEnd) {
+            Log.d(TAG, "✅ 匹配验证码提示模式: " + cleanText);
+            return true;
+        }
+        
+        // 备用检查：包含其他常见验证码关键词
         String[] promptKeywords = {
-                "请选择", "选择", "包含", "图片", "验证码", "验证", "captcha",
-                "select", "choose", "contain", "image", "verify"
+                "验证码", "验证", "captcha", "select", "choose", "contain", "image", "verify"
         };
         
-        String lowerText = text.toLowerCase();
+        String lowerText = cleanText.toLowerCase();
         for (String keyword : promptKeywords) {
             if (lowerText.contains(keyword)) {
                 return true;
@@ -119,37 +131,63 @@ public class OCRTextRecognizer {
      * @return 是否是目标物体
      */
     private boolean isTargetObject(String text) {
+        String cleanText = text.trim();
+        
+        // 排除一些明显不是目标物体的文字
+        String[] excludeKeywords = {
+                "请选择", "选择", "包含", "图片", "验证码", "验证", "的", "以下", "所有", "物体"
+        };
+        
+        for (String exclude : excludeKeywords) {
+            if (cleanText.contains(exclude)) {
+                return false;
+            }
+        }
+        
+        // 如果文字太短或太长，可能不是目标物体
+        if (cleanText.length() < 1 || cleanText.length() > 10) {
+            return false;
+        }
+        
+        // 常见目标物体关键词
         String[] targetKeywords = {
                 // 交通工具
-                "飞机", "汽车", "自行车", "摩托车", "公交车", "卡车", "轮船", "火车", "船", "车",
+                "飞机", "汽车", "自行车", "摩托车", "公交车", "卡车", "轮船", "火车", "船", "车", "直升机",
                 "airplane", "car", "bicycle", "motorcycle", "bus", "truck", "ship", "train",
                 
                 // 动物
-                "鸟", "猫", "狗", "马", "羊", "牛", "猪", "鸡", "鸭", "鹅", "大象", "熊", "斑马", "长颈鹿",
+                "鸟", "猫", "狗", "马", "羊", "牛", "猪", "鸡", "鸭", "鹅", "大象", "熊", "斑马", "长颈鹿", "老虎", "狮子",
                 "bird", "cat", "dog", "horse", "sheep", "cow", "pig", "chicken", "duck", "goose", "elephant", "bear", "zebra", "giraffe",
                 
                 // 物品
-                "椅子", "桌子", "床", "沙发", "电视", "电脑", "手机", "书", "杯子", "帽子",
+                "椅子", "桌子", "床", "沙发", "电视", "电脑", "手机", "书", "杯子", "帽子", "包", "鞋", "衣服",
                 "chair", "table", "bed", "sofa", "tv", "television", "computer", "phone", "book", "cup", "hat",
                 
                 // 食物
-                "苹果", "香蕉", "橙子", "葡萄", "草莓", "西瓜", "面包", "蛋糕",
+                "苹果", "香蕉", "橙子", "葡萄", "草莓", "西瓜", "面包", "蛋糕", "米饭", "面条",
                 "apple", "banana", "orange", "grape", "strawberry", "watermelon", "bread", "cake",
                 
                 // 自然
-                "树", "花", "草", "山", "海", "湖", "河", "云", "太阳", "月亮",
+                "树", "花", "草", "山", "海", "湖", "河", "云", "太阳", "月亮", "星星",
                 "tree", "flower", "grass", "mountain", "sea", "lake", "river", "cloud", "sun", "moon",
                 
                 // 其他常见物体
-                "房子", "门", "窗", "灯", "钟", "钥匙", "包", "鞋", "衣服",
-                "house", "door", "window", "light", "clock", "key", "bag", "shoe", "clothes"
+                "房子", "门", "窗", "灯", "钟", "钥匙", "球", "玩具", "乐器",
+                "house", "door", "window", "light", "clock", "key", "ball", "toy"
         };
         
-        String cleanText = text.trim().toLowerCase();
+        String lowerText = cleanText.toLowerCase();
         for (String keyword : targetKeywords) {
-            if (cleanText.equals(keyword.toLowerCase()) || cleanText.contains(keyword.toLowerCase())) {
+            if (lowerText.equals(keyword.toLowerCase()) || lowerText.contains(keyword.toLowerCase())) {
+                Log.d(TAG, "✅ 匹配目标物体关键词: " + cleanText + " -> " + keyword);
                 return true;
             }
+        }
+        
+        // 如果包含中文字符且长度合理，也可能是目标物体
+        if (cleanText.matches("[\\u4e00-\\u9fa5]+") && cleanText.length() <= 4) {
+            Log.d(TAG, "✅ 可能是中文目标物体: " + cleanText);
+            return true;
         }
         
         return false;
