@@ -382,8 +382,11 @@ public class ScreenMonitorService extends Service {
                 return null;
             }
             
+            // 如果已存在VirtualDisplay和ImageReader，先释放
+            releaseScreenCapture();
+            
             // 创建ImageReader
-            imageReader = ImageReader.newInstance(screenWidth, screenHeight, PixelFormat.RGBA_8888, 1);
+            imageReader = ImageReader.newInstance(screenWidth, screenHeight, PixelFormat.RGBA_8888, 2);
             
             // 创建VirtualDisplay
             virtualDisplay = mediaProjection.createVirtualDisplay(
@@ -400,6 +403,7 @@ public class ScreenMonitorService extends Service {
             Image image = imageReader.acquireLatestImage();
             if (image == null) {
                 Log.e(TAG, "无法获取屏幕图像");
+                releaseScreenCapture();
                 return null;
             }
             
@@ -407,11 +411,29 @@ public class ScreenMonitorService extends Service {
             Bitmap bitmap = imageToBitmap(image);
             image.close();
             
+            // 立即释放资源
+            releaseScreenCapture();
+            
             return bitmap;
             
         } catch (Exception e) {
             Log.e(TAG, "截取屏幕失败", e);
+            releaseScreenCapture();
             return null;
+        }
+    }
+    
+    /**
+     * 释放屏幕捕获资源
+     */
+    private void releaseScreenCapture() {
+        if (virtualDisplay != null) {
+            virtualDisplay.release();
+            virtualDisplay = null;
+        }
+        if (imageReader != null) {
+            imageReader.close();
+            imageReader = null;
         }
     }
     
@@ -499,6 +521,7 @@ public class ScreenMonitorService extends Service {
         Log.d(TAG, "ScreenMonitorService destroyed");
         
         stopMonitoring();
+        releaseScreenCapture();
         
         // 释放资源
         if (ocrRecognizer != null) {
