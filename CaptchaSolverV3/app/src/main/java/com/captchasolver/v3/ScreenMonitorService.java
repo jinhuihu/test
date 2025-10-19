@@ -142,7 +142,27 @@ public class ScreenMonitorService extends Service {
     private void initializeMediaProjection(Intent mediaProjectionData) {
         try {
             mediaProjection = projectionManager.getMediaProjection(Activity.RESULT_OK, mediaProjectionData);
-            Log.d(TAG, "MediaProjection初始化成功");
+            
+            // 注册MediaProjection回调
+            mediaProjection.registerCallback(new MediaProjection.Callback() {
+                @Override
+                public void onStop() {
+                    Log.d(TAG, "MediaProjection已停止");
+                    isMonitoring = false;
+                }
+                
+                @Override
+                public void onCapturedContentResize(int width, int height) {
+                    Log.d(TAG, "MediaProjection内容尺寸变化: " + width + "x" + height);
+                }
+                
+                @Override
+                public void onCapturedContentVisibilityChanged(boolean isVisible) {
+                    Log.d(TAG, "MediaProjection内容可见性变化: " + isVisible);
+                }
+            }, null);
+            
+            Log.d(TAG, "MediaProjection初始化成功，回调已注册");
         } catch (Exception e) {
             Log.e(TAG, "MediaProjection初始化失败", e);
         }
