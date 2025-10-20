@@ -314,16 +314,23 @@ public class ScreenMonitorService extends Service {
             CompletableFuture<OCRTextRecognizer.OCRResult> ocrFuture = ocrRecognizer.recognizeText(screenshot);
             
             ocrFuture.thenAccept(ocrResult -> {
+                // 每10次检查显示一次OCR调试信息
+                if (checkCounter % 10 == 1) {
+                    String debugInfo = "OCR: 提示=" + ocrResult.hasCaptchaPrompt + ", 目标=" + ocrResult.targetObject;
+                    showToast("🔍 " + debugInfo);
+                    Log.d(TAG, debugInfo);
+                }
+                
                 if (ocrResult.isValid()) {
                     Log.d(TAG, "检测到验证码: " + ocrResult);
                     showToast("✅ 检测到验证码！目标: " + ocrResult.targetObject);
                     handleCaptchaDetection(screenshot, ocrResult);
                 } else {
-                    Log.d(TAG, "未检测到有效验证码");
+                    Log.d(TAG, "未检测到有效验证码 - hasCaptchaPrompt: " + ocrResult.hasCaptchaPrompt + ", targetObject: " + ocrResult.targetObject);
                 }
             }).exceptionally(throwable -> {
                 Log.e(TAG, "OCR识别失败", throwable);
-                showToast("❌ OCR识别失败");
+                showToast("❌ OCR识别失败: " + throwable.getMessage());
                 return null;
             }).whenComplete((result, throwable) -> {
                 isProcessing = false;
