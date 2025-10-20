@@ -25,6 +25,7 @@ import android.os.Looper;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.WindowManager;
+import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 import androidx.core.app.NotificationCompat;
@@ -260,12 +261,14 @@ public class ScreenMonitorService extends Service {
             ocrFuture.thenAccept(ocrResult -> {
                 if (ocrResult.isValid()) {
                     Log.d(TAG, "检测到验证码: " + ocrResult);
+                    showToast("✅ 检测到验证码！目标: " + ocrResult.targetObject);
                     handleCaptchaDetection(screenshot, ocrResult);
                 } else {
                     Log.d(TAG, "未检测到有效验证码");
                 }
             }).exceptionally(throwable -> {
                 Log.e(TAG, "OCR识别失败", throwable);
+                showToast("❌ OCR识别失败");
                 return null;
             }).whenComplete((result, throwable) -> {
                 isProcessing = false;
@@ -331,9 +334,12 @@ public class ScreenMonitorService extends Service {
                     }
                     Log.d(TAG, "========== 需要点击 " + regionsToClick.size() + " 个图片区域 ==========");
                     
+                    showToast("🎯 识别完成！需要点击 " + regionsToClick.size() + " 个图片");
+                    
                     // 执行点击操作
                     captchaClicker.clickImageRegions(regionsToClick)
                             .thenRun(() -> {
+                                showToast("✅ 点击完成，正在提交验证");
                                 // 查找并点击验证按钮
                                 captchaClicker.clickVerifyButton(ocrResult.elements);
                             });
@@ -514,6 +520,17 @@ public class ScreenMonitorService extends Service {
                 .setContentIntent(pendingIntent)
                 .setOngoing(true)
                 .build();
+    }
+    
+    /**
+     * 显示Toast提示
+     * @param message 提示信息
+     */
+    private void showToast(final String message) {
+        mainHandler.post(() -> {
+            Toast.makeText(getApplicationContext(), message, Toast.LENGTH_SHORT).show();
+            Log.i(TAG, "Toast: " + message);
+        });
     }
     
     @Override
