@@ -398,15 +398,18 @@ public class ScreenMonitorService extends Service {
         try {
             if (mediaProjection == null) {
                 Log.e(TAG, "MediaProjection未初始化");
+                showToast("⚠️ MediaProjection未初始化，请重新开始监控");
                 return null;
             }
             
             // 如果已存在VirtualDisplay和ImageReader，先释放
             releaseScreenCapture();
             
+            Log.d(TAG, "创建ImageReader: " + screenWidth + "x" + screenHeight);
             // 创建ImageReader
             imageReader = ImageReader.newInstance(screenWidth, screenHeight, PixelFormat.RGBA_8888, 2);
             
+            Log.d(TAG, "创建VirtualDisplay...");
             // 创建VirtualDisplay
             virtualDisplay = mediaProjection.createVirtualDisplay(
                     "ScreenCapture",
@@ -414,18 +417,21 @@ public class ScreenMonitorService extends Service {
                     DisplayManager.VIRTUAL_DISPLAY_FLAG_AUTO_MIRROR,
                     imageReader.getSurface(), null, null
             );
+            Log.d(TAG, "VirtualDisplay创建成功");
             
             // 等待一帧
-            Thread.sleep(100);
+            Thread.sleep(150);
             
             // 获取最新图像
             Image image = imageReader.acquireLatestImage();
             if (image == null) {
                 Log.e(TAG, "无法获取屏幕图像");
+                showToast("⚠️ 无法获取屏幕图像，请重新授予屏幕录制权限");
                 releaseScreenCapture();
                 return null;
             }
             
+            Log.d(TAG, "成功获取屏幕图像");
             // 转换为Bitmap
             Bitmap bitmap = imageToBitmap(image);
             image.close();
@@ -435,8 +441,14 @@ public class ScreenMonitorService extends Service {
             
             return bitmap;
             
+        } catch (SecurityException e) {
+            Log.e(TAG, "权限错误: " + e.getMessage(), e);
+            showToast("❌ 屏幕录制权限错误，请重新授予权限");
+            releaseScreenCapture();
+            return null;
         } catch (Exception e) {
-            Log.e(TAG, "截取屏幕失败", e);
+            Log.e(TAG, "截取屏幕失败: " + e.getMessage(), e);
+            showToast("❌ 截图失败: " + e.getMessage());
             releaseScreenCapture();
             return null;
         }
