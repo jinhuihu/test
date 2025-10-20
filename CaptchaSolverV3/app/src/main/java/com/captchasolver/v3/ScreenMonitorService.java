@@ -302,7 +302,10 @@ public class ScreenMonitorService extends Service {
             Bitmap screenshot = captureScreen();
             if (screenshot == null) {
                 Log.w(TAG, "屏幕截图失败");
-                showToast("❌ 屏幕截图失败");
+                if (checkCounter % 10 == 1) {
+                    showToast("❌ 屏幕截图失败，继续监控中...");
+                }
+                isProcessing = false; // 重置标志，允许下次检查
                 return;
             }
             Log.d(TAG, "屏幕截图成功，尺寸: " + screenshot.getWidth() + "x" + screenshot.getHeight());
