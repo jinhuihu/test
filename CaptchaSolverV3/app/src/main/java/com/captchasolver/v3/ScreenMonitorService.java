@@ -48,6 +48,8 @@ public class ScreenMonitorService extends Service {
     private static final int NOTIFICATION_ID = 1001;
     private static final int SCREEN_CHECK_INTERVAL = 2000; // 2秒检查一次
     
+    private int checkCounter = 0; // 检查计数器
+    
     private MediaProjectionManager projectionManager;
     private MediaProjection mediaProjection;
     private VirtualDisplay virtualDisplay;
@@ -179,10 +181,12 @@ public class ScreenMonitorService extends Service {
         }
         
         Log.d(TAG, "开始监控屏幕");
+        showToast("🔍 开始监控验证码...");
         
         // 检查是否有MediaProjection权限
         if (mediaProjection == null) {
             Log.w(TAG, "MediaProjection未初始化，需要用户授予屏幕录制权限");
+            showToast("⚠️ MediaProjection未初始化");
             // 这里应该通过Intent请求屏幕录制权限，但需要Activity支持
             // 暂时先启动监控，在captureScreen时会提示用户
         }
@@ -245,12 +249,19 @@ public class ScreenMonitorService extends Service {
         Log.d(TAG, "开始检查屏幕内容");
         isProcessing = true;
         
+        // 每10次检查显示一次Toast，避免太多提示
+        checkCounter++;
+        if (checkCounter % 10 == 1) {
+            showToast("🔍 正在监控中... (第" + checkCounter + "次检查)");
+        }
+        
         try {
             // 截取屏幕
             Log.d(TAG, "开始截取屏幕");
             Bitmap screenshot = captureScreen();
             if (screenshot == null) {
                 Log.w(TAG, "屏幕截图失败");
+                showToast("❌ 屏幕截图失败");
                 return;
             }
             Log.d(TAG, "屏幕截图成功，尺寸: " + screenshot.getWidth() + "x" + screenshot.getHeight());
