@@ -63,8 +63,9 @@ public class OCRTextRecognizer {
         List<TextElement> elements = new ArrayList<>();
         String targetObject = null;
         boolean hasCaptchaPrompt = false;
+        Rect promptBounds = null;
         
-        // 遍历所有文本块
+        // 第一遍：查找验证码提示和所有文本
         for (Text.TextBlock block : visionText.getTextBlocks()) {
             String blockText = block.getText();
             Rect blockBounds = block.getBoundingBox();
@@ -74,17 +75,40 @@ public class OCRTextRecognizer {
             // 检查是否是验证码提示文字
             if (isCaptchaPrompt(blockText)) {
                 hasCaptchaPrompt = true;
+                promptBounds = blockBounds;
                 Log.d(TAG, "✅ 检测到验证码提示: " + blockText);
-            }
-            
-            // 检查是否是目标物体文字
-            if (isTargetObject(blockText)) {
-                targetObject = blockText.trim();
-                Log.d(TAG, "✅ 检测到目标物体: " + targetObject);
             }
             
             // 保存文本元素
             elements.add(new TextElement(blockText, blockBounds));
+        }
+        
+        // 第二遍：基于位置查找目标物体（必须在提示文字下方且接近）
+        if (hasCaptchaPrompt && promptBounds != null) {
+            int promptBottom = promptBounds.bottom;
+            int promptCenterX = (promptBounds.left + promptBounds.right) / 2;
+            
+            for (Text.TextBlock block : visionText.getTextBlocks()) {
+                String blockText = block.getText();
+                Rect blockBounds = block.getBoundingBox();
+                
+                // 跳过验证码提示本身
+                if (isCaptchaPrompt(blockText)) {
+                    continue;
+                }
+                
+                // 目标物体应该在提示下方100像素范围内，且水平居中
+                int verticalDistance = blockBounds.top - promptBottom;
+                int horizontalDistance = Math.abs((blockBounds.left + blockBounds.right) / 2 - promptCenterX);
+                
+                if (verticalDistance > 0 && verticalDistance < 150 && 
+                    horizontalDistance < 400 && 
+                    isTargetObject(blockText)) {
+                    targetObject = blockText.trim();
+                    Log.d(TAG, "✅ 检测到目标物体: " + targetObject + " (距离提示: " + verticalDistance + "px)");
+                    break; // 找到第一个符合条件的就停止
+                }
+            }
         }
         
         Log.d(TAG, "解析结果 - hasCaptchaPrompt: " + hasCaptchaPrompt + ", targetObject: " + targetObject);
