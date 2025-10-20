@@ -152,6 +152,7 @@ public class ScreenMonitorService extends Service {
                 public void onStop() {
                     Log.d(TAG, "MediaProjection已停止");
                     isMonitoring = false;
+                    releaseScreenCapture();
                 }
                 
                 @Override
@@ -166,8 +167,48 @@ public class ScreenMonitorService extends Service {
             }, null);
             
             Log.d(TAG, "MediaProjection初始化成功，回调已注册");
+            
+            // 立即创建VirtualDisplay和ImageReader（只创建一次，持续使用）
+            setupScreenCapture();
+            
         } catch (Exception e) {
             Log.e(TAG, "MediaProjection初始化失败", e);
+            showToast("❌ MediaProjection初始化失败: " + e.getMessage());
+        }
+    }
+    
+    /**
+     * 设置屏幕捕获（只调用一次）
+     */
+    private void setupScreenCapture() {
+        try {
+            if (mediaProjection == null) {
+                Log.e(TAG, "MediaProjection未初始化");
+                return;
+            }
+            
+            // 释放旧资源
+            releaseScreenCapture();
+            
+            Log.d(TAG, "创建ImageReader: " + screenWidth + "x" + screenHeight);
+            // 创建ImageReader
+            imageReader = ImageReader.newInstance(screenWidth, screenHeight, PixelFormat.RGBA_8888, 2);
+            
+            Log.d(TAG, "创建VirtualDisplay...");
+            // 创建VirtualDisplay（只创建一次）
+            virtualDisplay = mediaProjection.createVirtualDisplay(
+                    "ScreenCapture",
+                    screenWidth, screenHeight, screenDensity,
+                    DisplayManager.VIRTUAL_DISPLAY_FLAG_AUTO_MIRROR,
+                    imageReader.getSurface(), null, null
+            );
+            
+            Log.d(TAG, "VirtualDisplay创建成功，可以持续使用");
+            showToast("✅ 屏幕捕获初始化成功");
+            
+        } catch (Exception e) {
+            Log.e(TAG, "设置屏幕捕获失败", e);
+            showToast("❌ 设置屏幕捕获失败: " + e.getMessage());
         }
     }
     
@@ -391,43 +432,24 @@ public class ScreenMonitorService extends Service {
     }
     
     /**
-     * 截取屏幕
+     * 截取屏幕（复用VirtualDisplay）
      * @return 屏幕截图
      */
     private Bitmap captureScreen() {
         try {
-            if (mediaProjection == null) {
-                Log.e(TAG, "MediaProjection未初始化");
-                showToast("⚠️ MediaProjection未初始化，请重新开始监控");
+            if (virtualDisplay == null || imageReader == null) {
+                Log.e(TAG, "VirtualDisplay或ImageReader未初始化");
+                showToast("⚠️ 屏幕捕获未初始化");
                 return null;
             }
             
-            // 如果已存在VirtualDisplay和ImageReader，先释放
-            releaseScreenCapture();
-            
-            Log.d(TAG, "创建ImageReader: " + screenWidth + "x" + screenHeight);
-            // 创建ImageReader
-            imageReader = ImageReader.newInstance(screenWidth, screenHeight, PixelFormat.RGBA_8888, 2);
-            
-            Log.d(TAG, "创建VirtualDisplay...");
-            // 创建VirtualDisplay
-            virtualDisplay = mediaProjection.createVirtualDisplay(
-                    "ScreenCapture",
-                    screenWidth, screenHeight, screenDensity,
-                    DisplayManager.VIRTUAL_DISPLAY_FLAG_AUTO_MIRROR,
-                    imageReader.getSurface(), null, null
-            );
-            Log.d(TAG, "VirtualDisplay创建成功");
-            
             // 等待一帧
-            Thread.sleep(150);
+            Thread.sleep(100);
             
             // 获取最新图像
             Image image = imageReader.acquireLatestImage();
             if (image == null) {
-                Log.e(TAG, "无法获取屏幕图像");
-                showToast("⚠️ 无法获取屏幕图像，请重新授予屏幕录制权限");
-                releaseScreenCapture();
+                Log.w(TAG, "无法获取屏幕图像，可能需要等待下一帧");
                 return null;
             }
             
@@ -436,20 +458,10 @@ public class ScreenMonitorService extends Service {
             Bitmap bitmap = imageToBitmap(image);
             image.close();
             
-            // 立即释放资源
-            releaseScreenCapture();
-            
             return bitmap;
             
-        } catch (SecurityException e) {
-            Log.e(TAG, "权限错误: " + e.getMessage(), e);
-            showToast("❌ 屏幕录制权限错误，请重新授予权限");
-            releaseScreenCapture();
-            return null;
         } catch (Exception e) {
             Log.e(TAG, "截取屏幕失败: " + e.getMessage(), e);
-            showToast("❌ 截图失败: " + e.getMessage());
-            releaseScreenCapture();
             return null;
         }
     }
